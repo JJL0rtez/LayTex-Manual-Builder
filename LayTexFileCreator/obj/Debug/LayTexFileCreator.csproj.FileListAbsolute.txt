@@ -1,0 +1,14 @@
+C:\Users\jjlor\source\repos\LayTexFileCreator\LayTexFileCreator\bin\Debug\LayTexFileCreator.exe.config
+C:\Users\jjlor\source\repos\LayTexFileCreator\LayTexFileCreator\bin\Debug\LayTexFileCreator.exe
+C:\Users\jjlor\source\repos\LayTexFileCreator\LayTexFileCreator\bin\Debug\LayTexFileCreator.pdb
+C:\Users\jjlor\source\repos\LayTexFileCreator\LayTexFileCreator\obj\Debug\LayTexFileCreator.csprojAssemblyReference.cache
+C:\Users\jjlor\source\repos\LayTexFileCreator\LayTexFileCreator\obj\Debug\MainWindow.g.cs
+C:\Users\jjlor\source\repos\LayTexFileCreator\LayTexFileCreator\obj\Debug\App.g.cs
+C:\Users\jjlor\source\repos\LayTexFileCreator\LayTexFileCreator\obj\Debug\LayTexFileCreator_MarkupCompile.cache
+C:\Users\jjlor\source\repos\LayTexFileCreator\LayTexFileCreator\obj\Debug\LayTexFileCreator_MarkupCompile.lref
+C:\Users\jjlor\source\repos\LayTexFileCreator\LayTexFileCreator\obj\Debug\MainWindow.baml
+C:\Users\jjlor\source\repos\LayTexFileCreator\LayTexFileCreator\obj\Debug\LayTexFileCreator.g.resources
+C:\Users\jjlor\source\repos\LayTexFileCreator\LayTexFileCreator\obj\Debug\LayTexFileCreator.Properties.Resources.resources
+C:\Users\jjlor\source\repos\LayTexFileCreator\LayTexFileCreator\obj\Debug\LayTexFileCreator.csproj.GenerateResource.cache
+C:\Users\jjlor\source\repos\LayTexFileCreator\LayTexFileCreator\obj\Debug\LayTexFileCreator.exe
+C:\Users\jjlor\source\repos\LayTexFileCreator\LayTexFileCreator\obj\Debug\LayTexFileCreator.pdb
