@@ -8,8 +8,13 @@ namespace LayTexFileCreator
 {
     public class Element
     {
-        string title;
+        string title;// { get; set; }
+        string Body { get; set; }
+        string ImageLoc { get; set; }
+
         List<string> data;
+        List<List<string>> TableContents { get; set; }
+
 
         public Element()
         {
@@ -17,13 +22,38 @@ namespace LayTexFileCreator
             data = new List<string>();
         }
 
-        public string getTitle()
+        public Element(string c, string d)
         {
+            data = new List<string>();
+            this.title = c;
+            this.data.Add(d);
+        }
+
+        public Element(string currentTitle, List<string> data)
+        {
+            this.title = currentTitle;
+            this.data = data;
+        }
+
+        public string GetTitle()
+        {
+            Console.WriteLine(this.title);
             return this.title;
         }
-        public List<string> getData()
+        public List<string> GetData()
         {
             return this.data;
+        }
+        public void SetTitle(string str)
+        {
+            this.title = str;
+        }
+        public void SetData(int pos, string str)
+        {
+            if (this.data.Count() > pos)
+            {
+                data[pos] = str;
+            }
         }
     }
 }
