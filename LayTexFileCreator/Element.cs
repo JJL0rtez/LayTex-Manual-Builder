@@ -11,6 +11,7 @@ namespace LayTexFileCreator
         string title;// { get; set; }
         string Body { get; set; }
         string ImageLoc { get; set; }
+        int ImageSize = 1;
 
         List<string> data;
         List<List<string>> TableContents { get; set; }
@@ -54,6 +55,16 @@ namespace LayTexFileCreator
             {
                 data[pos] = str;
             }
+        }
+
+        public void SetImageSize(int v)
+        {
+            this.ImageSize = v;
+        }
+
+        public void setImagLoc(string filePath)
+        {
+            this.ImageLoc = filePath;
         }
     }
 }

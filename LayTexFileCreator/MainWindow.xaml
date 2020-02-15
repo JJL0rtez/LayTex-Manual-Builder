@@ -38,8 +38,8 @@
                         <Grid>
                             <Button Click="AddParagraph_Click" Name="addParagraph" Content="Paragraph" HorizontalAlignment="Left" Margin="15,5,0,0" VerticalAlignment="Top" Width="70" Height="27"/>
                             <Button Click="AddList_Click" Name="addList" Content="List" HorizontalAlignment="Left" Margin="114,5,0,0" VerticalAlignment="Top" Width="70" Height="27"/>
-                            <Button Click="AddParagraph_Click" x:Name="addParagraph_Copy" Content="Figure" HorizontalAlignment="Left" Margin="15,36,0,0" VerticalAlignment="Top" Width="70" Height="27"/>
-                            <Button Click="AddParagraph_Click" x:Name="addParagraph_Copy1" Content="Table" HorizontalAlignment="Left" Margin="114,37,0,-1" VerticalAlignment="Top" Width="70" Height="27"/>
+                            <Button Click="AddFigure_Click" x:Name="AddFigure" Content="Figure" HorizontalAlignment="Left" Margin="15,36,0,0" VerticalAlignment="Top" Width="70" Height="27"/>
+                            <Button Click="AddTable_Click" x:Name="AddParagraph" Content="Table" HorizontalAlignment="Left" Margin="114,37,0,-1" VerticalAlignment="Top" Width="70" Height="27"/>
                         </Grid>
                     </GroupBox>
                     <GroupBox Header="Elements" HorizontalAlignment="Left" Height="277" Margin="556,91,0,0" VerticalAlignment="Top" Width="210" RenderTransformOrigin="0.2,-0.086">

@@ -66,6 +66,8 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="ChapterWindow.cs" />
+    <Compile Include="LaTex.cs" />
     <Compile Include="Page.cs" />
     <Compile Include="Element.cs" />
     <Compile Include="MainWindow.xaml.cs">
