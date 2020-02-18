@@ -11,7 +11,9 @@ namespace LayTexFileCreator
         string title;// { get; set; }
         string Body { get; set; }
         string ImageLoc { get; set; }
+        string ElementType { get; set; }
         int ImageSize = 1;
+
 
         List<string> data;
         List<List<string>> TableContents { get; set; }
@@ -36,6 +38,14 @@ namespace LayTexFileCreator
             this.data = data;
         }
 
+        public string getElementType()
+        {
+            return this.ElementType;
+        }
+        public void setElementType(string str)
+        {
+            this.ElementType = str;
+        }
         public string GetTitle()
         {
             Console.WriteLine(this.title);

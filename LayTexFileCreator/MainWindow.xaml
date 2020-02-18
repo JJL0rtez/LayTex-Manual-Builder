@@ -44,8 +44,7 @@
                     </GroupBox>
                     <GroupBox Header="Elements" HorizontalAlignment="Left" Height="277" Margin="556,91,0,0" VerticalAlignment="Top" Width="210" RenderTransformOrigin="0.2,-0.086">
                         <Grid>
-                            <ScrollViewer x:Name="elementSV" HorizontalAlignment="Left" Height="290" VerticalAlignment="Top" Width="198"/>
-
+                            <ListBox Name="elementSV" HorizontalAlignment="Left" Height="234" Margin="10,10,0,0" VerticalAlignment="Top" Width="178"/>
                         </Grid>
                     </GroupBox>
                     <GroupBox Header="Current Element" HorizontalAlignment="Left" Height="368" Margin="10,0,0,0" VerticalAlignment="Top" Width="541" RenderTransformOrigin="-0.066,-0.036">

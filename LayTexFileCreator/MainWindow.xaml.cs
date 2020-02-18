@@ -175,8 +175,8 @@ namespace LayTexFileCreator
             // Draw GroupBox and Grid
             GroupBox groupBox = new GroupBox();
             Grid grid = new Grid(), gridMain = new Grid();
-            groupBox.Width = subWindow.Width - 10;
-            groupBox.Height = subWindow.Height - 10;
+            groupBox.Width = subWindow.Width - 20;
+            groupBox.Height = subWindow.Height - 60;
             groupBox.VerticalAlignment = VerticalAlignment.Center;
             groupBox.HorizontalAlignment = HorizontalAlignment.Center;
             groupBox.Header = "Page Order Selector";
@@ -185,10 +185,11 @@ namespace LayTexFileCreator
             //groupBox.Content = grid;
 
 
-            //grid.Width = groupBox.Width - 10;
-            //grid.Height = groupBox.Height - 10;
-            //grid.VerticalAlignment = VerticalAlignment.Center;
-            //grid.HorizontalAlignment = HorizontalAlignment.Center;
+            grid.Width = groupBox.Width - 10;
+            grid.Height = groupBox.Height - 10;
+            grid.VerticalAlignment = VerticalAlignment.Center;
+            grid.HorizontalAlignment = HorizontalAlignment.Center;
+
             gridMain.Width = subWindow.Width;
             gridMain.Height = subWindow.Height;
             gridMain.VerticalAlignment = VerticalAlignment.Center;
@@ -196,7 +197,20 @@ namespace LayTexFileCreator
             //grid.Margin = new Thickness(5);
             // Add selector controls
             ScrollViewer scrollViewerBefore = new ScrollViewer();
+            scrollViewerBefore.Height = subWindow.Height - 100;
+            scrollViewerBefore.Width = subWindow.Width / 2 - 30;
+            scrollViewerBefore.HorizontalAlignment = HorizontalAlignment.Left;
+            scrollViewerBefore.VerticalAlignment = VerticalAlignment.Center;
+            scrollViewerBefore.Background = Brushes.AntiqueWhite;
+            scrollViewerBefore.Margin = new Thickness(1);
             ScrollViewer scrollViewerAfter = new ScrollViewer();
+            scrollViewerAfter.Height = subWindow.Height - 100;
+            scrollViewerAfter.Width = subWindow.Width / 2 - 30;
+            scrollViewerAfter.HorizontalAlignment = HorizontalAlignment.Right;
+            scrollViewerAfter.VerticalAlignment = VerticalAlignment.Center;
+            scrollViewerAfter.Background = Brushes.AntiqueWhite;
+            scrollViewerAfter.Margin = new Thickness(1);
+
             List<Button> beforeList = new List<Button>();
             List<Button> afterList = new List<Button>();
             Menu menu = new Menu();
@@ -225,64 +239,70 @@ namespace LayTexFileCreator
             page.Items.Insert(0, pageView);
             chapter.Items.Insert(0, chapterView);
 
+            RowDefinition row;
+            gridMain.RowDefinitions.Clear();
+            row = new RowDefinition();
+            row.Height = new GridLength(25, GridUnitType.Auto);
+            gridMain.RowDefinitions.Add(row);
+            row = new RowDefinition();
+            row.Height = new GridLength(25, GridUnitType.Auto);
+            gridMain.RowDefinitions.Add(row);
+
+            Grid.SetRow(menu, 0);
             gridMain.Children.Add(menu);
-           // gridMain.Children.Add(groupBox);
+            Grid.SetRow(groupBox, 1);
+            gridMain.Children.Add(groupBox);
+
+            groupBox.Content = grid;
+
+            grid.Children.Add(scrollViewerBefore);
+            grid.Children.Add(scrollViewerAfter);
+            // gridMain.Children.Add(groupBox);
             subWindow.Content = gridMain;
         }
         private void UpdateElementList() {
-            Grid gridE = new Grid();
-            Grid elementGrid = new Grid();
-            RowDefinition row;
+            // Grid gridE = new Grid();
+            // Grid elementGrid = new Grid();
+            //  RowDefinition row;
             //remoove old item
             //if (elements.Count() > selectedId && selectedId != -1)
-           // {
-           //     elements.RemoveAt(selectedId);
-           // }
-            var titleB = new Button();
-            grid.Children.Clear();
-            grid.RowDefinitions.Clear();
+            // {
+            //     elements.RemoveAt(selectedId);
+            // }
+            //   var titleB = new Button();
+            //  grid.Children.Clear();
+            // grid.RowDefinitions.Clear();
             // If the data was updated then re add it to the element list
-            if (currentTitle != "" && currentBody != "")
-            {
-
-                // elements.Add(new Element(currentTitle, currentBody));
-
-                grid.Children.Clear();
-                sv.Content = null;
-            }
+            // if (currentTitle != "" && currentBody != "")
+            // {
+            //     grid.Children.Clear();
+            //      sv.Content = null;
+            // }
 
             // now redraw with new items
-            int cId = 0;
-            elementGrid.ShowGridLines = true;
+            // int cId = 0;
+            //   elementGrid.ShowGridLines = true;
+            // foreach (Element element in elements)
+            // {
+            //    row = new RowDefinition {   Height = new GridLength(25, GridUnitType.Auto)  };
+            //     elementGrid.RowDefinitions.Add(row);
+            // }
+            Button elementNameBttn = new Button();
+            int i = 0;
             foreach (Element element in elements)
             {
-                row = new RowDefinition {   Height = new GridLength(25, GridUnitType.Auto)  };
-                elementGrid.RowDefinitions.Add(row);
+                elementNameBttn = new Button();
+                elementNameBttn.Tag = i;
+                elementNameBttn.Click += Element_click;
+                elementNameBttn.Content =  "(" + element.getElementType() + ") " +  element.GetTitle();
+                i++;
+                elementSV.Items.Add(elementNameBttn);
             }
-
-            foreach (Element element in elements)
-            {
-                titleB = new Button();
-                title.Name = "Id" + cId.ToString();
-                if (element.GetData().Count() > 1)
-                {
-                    titleB.Content = " (List) " + element.GetTitle();
-                }
-                else
-                {
-                    titleB.Content = " (Paragraph) " + element.GetTitle();
-                }
-                titleB.Tag = cId;
-                titleB.Click += Element_click;
-                Grid.SetRow(titleB, cId);
-                elementGrid.Children.Add(titleB);
-                cId++;
-            }
-            gridE.Width = 155;
-            gridE.Height = 290;
+           // gridE.Width = 155;
+          //  gridE.Height = 290;
             //gridE.Background = Brushes.Pink;
-            gridE.Children.Add(elementGrid);
-            elementSV.Content = gridE;
+           // gridE.Children.Add(elementGrid);
+          //  elementSV.Items.Add = elementNameList;// gridE;
         }
         private void Element_click(object sender, RoutedEventArgs e)
         {
@@ -316,19 +336,6 @@ namespace LayTexFileCreator
                 row.Height = new GridLength(25, GridUnitType.Auto);
                 grid.RowDefinitions.Add(row);
             }
-        }
-        private void AddGridColoums(int numCol)
-        {
-            //RowDefinition row;
-            //grid.RowDefinitions.Clear();
-
-            //while (numRows > 0)
-            //{
-            //    row = new RowDefinition();
-            //    numRows--;
-            //    row.Height = new GridLength(25, GridUnitType.Auto);
-            //    grid.RowDefinitions.Add(row);
-            //}
         }
         private void InitlizeList(string id)
         {
