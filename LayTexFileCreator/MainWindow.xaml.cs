@@ -30,15 +30,19 @@ namespace LayTexFileCreator
         Grid grid = new Grid();
         Label titleLabel = new Label(), bodyLabel = new Label();
         Button deleteBtn = new Button(), addBtn = new Button();
-        List<TextBox> listTextBox = new List<TextBox>();
         int selectedId = 0;
         string currentTitle = "", currentBody = "";
+        // List item
+        List<TextBox> listTextBox = new List<TextBox>();
+        ListBox listBox = new ListBox();
+
         // Figure
         Image image = new Image();
         Button uploadButton = new Button();
         RadioButton smallImage = new RadioButton();
         RadioButton mediumImage = new RadioButton();
         RadioButton largeImage = new RadioButton();
+        string selectedFile = "";
         // Table
         List<List<TextBox>> tableData = new List<List<TextBox>>();
         List<List<String>> tableStringData = new List<List<String>>();
@@ -51,6 +55,10 @@ namespace LayTexFileCreator
             InitializeComponent();
             elements = new List<Element>();
             InitialSetup();
+            addBtn.Content = "Add Element";
+            body.Text = "";
+            title.Text = "";
+            InitlizeParagraph("-1");
         }
         private void AddParagraph_Click(object sender, RoutedEventArgs e)
         {
@@ -62,7 +70,6 @@ namespace LayTexFileCreator
         }
         private void UpdateBody(object sender, TextChangedEventArgs e)
         {
-            //Console.WriteLine(body.Text + " << --  Body");
             if (body.Text != "")
             {
                 currentBody = body.Text;
@@ -70,25 +77,16 @@ namespace LayTexFileCreator
         }
         private void UpdateTitle(object sender, TextChangedEventArgs e)
         {
-            //Console.WriteLine(title.Text + " << --  TITLE");
             if (title.Text != "")
             {
                 currentTitle = title.Text;
-                if (selectedId == -1)
-                {
-                    elements[elements.Count()-1].SetTitle(currentTitle);
-
-                }
-                else
-                {
-                    elements[selectedId].SetTitle(currentTitle);
-
-                }
             }
-
         }
         private void AddClick(object sender, RoutedEventArgs e)
         {
+            Button button = (Button)sender;
+            string[] strlist = button.Tag.ToString().Split(',');
+            SaveData(strlist[0],int.Parse(strlist[1]));
             UpdateElementList();  
         }
         private void PushItem_Click(object sender, RoutedEventArgs e)
@@ -109,10 +107,9 @@ namespace LayTexFileCreator
         private void AddFigure_Click(object sender, RoutedEventArgs e)
         {
             Button button = (Button)sender;
-            elements.Add(new Element());
+            //elements.Add(new Element());
             InitlizeFigure(elements.Count() - 1);
         }
-        
         private void DeleteClick(object sender, RoutedEventArgs e)
         {
             if (elements.Count() != 0)
@@ -127,7 +124,7 @@ namespace LayTexFileCreator
         }
         private void AddList_Click(object sender, RoutedEventArgs e)
         {
-            elements.Add(new Element());
+            //elements.Add(new Element());
             addBtn.Content = "Add Element";
             listTextBox.Clear();
             listTextBox.Add(new TextBox());
@@ -261,68 +258,39 @@ namespace LayTexFileCreator
             subWindow.Content = gridMain;
         }
         private void UpdateElementList() {
-            // Grid gridE = new Grid();
-            // Grid elementGrid = new Grid();
-            //  RowDefinition row;
-            //remoove old item
-            //if (elements.Count() > selectedId && selectedId != -1)
-            // {
-            //     elements.RemoveAt(selectedId);
-            // }
-            //   var titleB = new Button();
-            //  grid.Children.Clear();
-            // grid.RowDefinitions.Clear();
-            // If the data was updated then re add it to the element list
-            // if (currentTitle != "" && currentBody != "")
-            // {
-            //     grid.Children.Clear();
-            //      sv.Content = null;
-            // }
-
-            // now redraw with new items
-            // int cId = 0;
-            //   elementGrid.ShowGridLines = true;
-            // foreach (Element element in elements)
-            // {
-            //    row = new RowDefinition {   Height = new GridLength(25, GridUnitType.Auto)  };
-            //     elementGrid.RowDefinitions.Add(row);
-            // }
             Button elementNameBttn = new Button();
             int i = 0;
+            elementSV.Items.Clear();
             foreach (Element element in elements)
             {
                 elementNameBttn = new Button();
-                elementNameBttn.Tag = i;
+                elementNameBttn.Tag = element.getElementType() + "," + i;
                 elementNameBttn.Click += Element_click;
                 elementNameBttn.Content =  "(" + element.getElementType() + ") " +  element.GetTitle();
+                elementNameBttn.Width = elementSV.Width - 10;
                 i++;
                 elementSV.Items.Add(elementNameBttn);
             }
-           // gridE.Width = 155;
-          //  gridE.Height = 290;
-            //gridE.Background = Brushes.Pink;
-           // gridE.Children.Add(elementGrid);
-          //  elementSV.Items.Add = elementNameList;// gridE;
         }
         private void Element_click(object sender, RoutedEventArgs e)
         {
-            addBtn.Content = "Update Element";
             Button button = (Button)sender;
-            //Console.WriteLine(button.Tag + "<--------------");
-            if (Int32.Parse(button.Tag.ToString()) <= elements.Count() - 1) {
-                if (elements.ElementAt(int.Parse(button.Tag.ToString())).GetData().Count()  <= 1 ){
-                    if (button.Content.ToString().Contains("  (List)  "))
-                    {
-                        InitlizeList(button.Tag.ToString());
-                    }
-                    else
-                    {
-                        InitlizeParagraph(button.Tag.ToString());
-                    }
-                }
-                return;
+            addBtn.Content = "Update Element";
+            string[] strlist = button.Tag.ToString().Split(',');
+            if (strlist[0] == "Paragraph")
+            {
+                InitlizeParagraph(strlist[1]);
             }
-            InitlizeList(button.Tag.ToString());
+            else if (strlist[0] == "List")
+            {
+                InitlizeList(strlist[1]);
+            }
+            else if (strlist[0] == "Figure")
+            {
+                InitlizeFigure(int.Parse(strlist[1]));
+            }
+            else
+                InitlizeTable(int.Parse(strlist[1]));
         }
         private void AddGridRows(int numRows)
         {
@@ -339,7 +307,10 @@ namespace LayTexFileCreator
         }
         private void InitlizeList(string id)
         {
-
+            addBtn.Tag = "List," + id;
+            deleteBtn.Tag = "List," + id;
+            titleLabel.Content = "List Title";
+           // title.Text = "";
             //initlize listS
             grid.Children.Clear();
             grid.RowDefinitions.Clear();
@@ -349,23 +320,20 @@ namespace LayTexFileCreator
             selectedId = idNum;
             //needsAdded = true;
 
+            listBox.Width = grid.Width - 10;
+
+            // Set the tag for add and delete
+
 
             TextBox tmp = new TextBox();
-
+            listBox.Items.Clear();
             for (int i = 0; i < listTextBox.Count(); i++)
             {
+                tmp = new TextBox();
                 tmp = listTextBox.ElementAt(i);
                 tmp.Name = "listItemTextBox" + i;
-                if (selectedId != -1 && elements[selectedId].GetData().Count() > i)
-                {
-                    tmp.Text = elements[selectedId].GetData()[i];
-                }
-                else
-                {
-                    tmp.Text = "";
-                }
                 
-                tmp.Width = sv.Width - 45;
+                tmp.Width = sv.Width - 50;
                 tmp.Height = 20;
                 tmp.Background = Brushes.AntiqueWhite;
                 tmp.Foreground = Brushes.Navy;
@@ -374,29 +342,11 @@ namespace LayTexFileCreator
                 tmp.SpellCheck.IsEnabled = true;
                 tmp.TextWrapping = 0;
                 tmp.Tag = i;
-            }
-
-            // Grid
-            grid.Width = sv.Width - 25;
-            if (listTextBox.Count() > 10)
-            {
-                grid.Height = sv.Height - 5 + listTextBox.Count() - 10 * 20;
-            }
-            else
-            {
-                grid.Height = sv.Height - 5;
-            }
-
-            if (elements.Count() != 0)
-            {
-                AddGridRows(listTextBox.Count() + 5);
-            }
-            else
-            {
-                AddGridRows(5);
+                listBox.Items.Add(tmp);
             }
 
             grid.Children.Clear();
+            AddGridRows(5);
             // Add elements to the grid
             Grid.SetRow(titleLabel, 0);
             grid.Children.Add(titleLabel);
@@ -404,30 +354,23 @@ namespace LayTexFileCreator
             grid.Children.Add(title);
             Grid.SetRow(bodyLabel, 2);
             grid.Children.Add(bodyLabel);
+            Grid.SetRow(listBox, 3);
+            grid.Children.Add(listBox);
 
             // Add grid to the app
             sv.Content = grid;
-            int j = 3;
+
+
+            Grid.SetRow(addBtn, 4);
+            grid.Children.Add(addBtn);
+            Grid.SetRow(deleteBtn, 5);
+            grid.Children.Add(deleteBtn);
+
             if (idNum != -1)
             {
                 title.Text = elements.ElementAt(idNum).GetTitle();
-                foreach(TextBox text in listTextBox)
-                {
-                    Grid.SetRow(text, j);
-                    grid.Children.Add(text);
-                    j++;
-                }
+               // body.Text = elements.ElementAt(idNum).GetBody();
             }
-            else
-            {
-                Grid.SetRow(listTextBox.ElementAt(0), j);
-                grid.Children.Add(listTextBox.ElementAt(0));
-                j++;
-            }
-            Grid.SetRow(addBtn, j);
-            grid.Children.Add(addBtn);
-            Grid.SetRow(deleteBtn, j);
-            grid.Children.Add(deleteBtn);
         }
         private void UpdatelistText(object sender, TextChangedEventArgs e)
         {
@@ -438,27 +381,21 @@ namespace LayTexFileCreator
             if (textBox.Text != "" && int.Parse(textBox.Tag.ToString()) == listTextBox.Count()-1)
             {
                 listTextBox.Add(new TextBox());
-               // elements.Add(new Element());
                 InitlizeList(selectedId.ToString());
                 int tag = int.Parse(textBox.Tag.ToString());
-                elements[tag].SetData(tag, textBox.Text);
             }
-
-            //updata graphicial display
-            
         }
         private void InitlizeParagraph(string id)
         {
-            int idNum = Int32.Parse(id);
-            selectedId = idNum;
-           
+            addBtn.Tag = "Paragraph," + id;
+            deleteBtn.Tag = "Paragraph," + id;
             //Initlize and setup paragraph
-
             grid.Children.Clear();
             sv.Content = null;
-
-
             AddGridRows(5);
+            int idNum = Int32.Parse(id);
+            selectedId = idNum;
+            titleLabel.Content = "Paragraph Title";
 
             // Add elements to the grid
             Grid.SetRow(titleLabel, 0);
@@ -482,7 +419,7 @@ namespace LayTexFileCreator
             sv.Content = grid;
             if (idNum != -1) {
                 title.Text = elements.ElementAt(idNum).GetTitle();
-                body.Text = elements.ElementAt(idNum).GetData().ElementAt(0);
+                body.Text = elements.ElementAt(idNum).GetBody();
             }
         }
         private void InitialSetup()
@@ -532,7 +469,7 @@ namespace LayTexFileCreator
             addBtn.Name = "add_btn";
             addBtn.Content = "Add Element";
             addBtn.Height = 25;
-            addBtn.Width = 95;
+            addBtn.Width = 115;
             addBtn.FontSize = 14;
             addBtn.Margin = new Thickness(5, 5, 10, 5);
             addBtn.FontWeight = FontWeights.Bold;
@@ -543,7 +480,7 @@ namespace LayTexFileCreator
             // Labels
             titleLabel.Name = "titleLabel";
             titleLabel.Content = "Title";
-            titleLabel.Width = 35;
+            titleLabel.Width = 135;
             titleLabel.Height = 25;
             titleLabel.FontWeight = FontWeights.Bold;
             titleLabel.Background = Brushes.FloralWhite;
@@ -588,15 +525,18 @@ namespace LayTexFileCreator
             addColumnBtn.Margin = new Thickness(10, 0, 0, 0);
             addColumnBtn.HorizontalAlignment = HorizontalAlignment.Left;
 
+            //
+            listBox.Height = 200;
+            listBox.Background = Brushes.FloralWhite;
+            listBox.Margin = new Thickness(5);
+            listBox.HorizontalAlignment = HorizontalAlignment.Center;
         }
-
         private void AddRowBtn_Click(object sender, RoutedEventArgs e)
         {
             RowDefinition row = new RowDefinition();
             row.Height = new GridLength(25, GridUnitType.Auto);
             tableGrid.RowDefinitions.Add(row);
         }
-
         private void RemoveColumnBtn_Click(object sender, RoutedEventArgs e)
         {
             if (tableGrid.ColumnDefinitions.Count() > 0)
@@ -604,7 +544,6 @@ namespace LayTexFileCreator
                 tableGrid.ColumnDefinitions.RemoveAt(tableGrid.ColumnDefinitions.Count() - 1);
             };
         }
-
         private void RemoveRowBtn_Click(object sender, RoutedEventArgs e)
         {
             if (tableGrid.RowDefinitions.Count() > 0)
@@ -614,21 +553,20 @@ namespace LayTexFileCreator
         }
         private void AddTable_Click(object sender, RoutedEventArgs e)
         {
-            elements.Add(new Element());
+            //elements.Add(new Element());
             InitlizeTable(elements.Count());
         }
-
-        
         private void AddColumnBtn_Click(object sender, RoutedEventArgs e)
         {
             ColumnDefinition column = new ColumnDefinition();
             column.Width = new GridLength(25, GridUnitType.Auto);
             tableGrid.ColumnDefinitions.Add(column);
         }
-     
         private void InitlizeFigure(int id)
         {
             //Steps
+            addBtn.Tag = "Figure," + id;
+            deleteBtn.Tag = "Figure," + id;
             // Clear other Controls
             //int idNum = Int32.Parse(id);
             selectedId = id;
@@ -709,32 +647,29 @@ namespace LayTexFileCreator
             //add data to figure if avalible
 
         }
-
         private void OpenImageUploadDialog(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog()
             {
                 FileName = "",
-                Filter = "Image files (*.png)|*.png",
+                Filter = "Image files (*.png*, *.jpeg)|*.png;*.jpeg",
                 Title = "Open an Image",
                 DefaultExt = ".png.jpeg.ico.gif"
             };
             Nullable<bool> result = openFileDialog.ShowDialog();
             if (result == true)
             {
-                elements[selectedId].setImagLoc(openFileDialog.FileName);
+                selectedFile = openFileDialog.FileName;
                 Uri uri = new Uri(openFileDialog.FileName);
                 image.Source = new BitmapImage(uri);
 
             }
         }
-
         private void updateImageSize(object sender, RoutedEventArgs e)
         {
             RadioButton button = (RadioButton)sender;
             elements[selectedId].SetImageSize(int.Parse(button.Tag.ToString()));
         }
-
         private void InitlizeTable(int id)                                              
         {
             //Steps
@@ -768,6 +703,7 @@ namespace LayTexFileCreator
             }
             tableGrid =  AddTableGrid(totalRows, totalColoums);
             // Now that grid is there add all the textboxs to the grid and content 
+           // tableStringData = elements[selectedId].getListItems();
             for (int rows = 0; rows < totalRows; rows++)
             {
                 for (int columns = 0; columns < totalColoums; columns++)
@@ -802,8 +738,6 @@ namespace LayTexFileCreator
 
 
         }
-
-
         private Grid AddTableGrid(int totalRows, int totalColoums)
         {
             Grid tGrid = new Grid();
@@ -830,6 +764,78 @@ namespace LayTexFileCreator
                 tGrid.ColumnDefinitions.Add(column);
             }
             return tGrid;
+        }
+        private bool SaveData(string type, int id)
+        {
+            try
+            {
+                if (title.Text != "") {
+                // If id is -1 add an element to elements and change id to that new id
+                if (id < 0)
+                {
+                    elements.Add(new Element());
+                    id = elements.Count() - 1;
+                }
+                // Get title and reset title
+
+                elements[id].SetTitle(title.Text);
+                // Set type to element
+                elements[id].setElementType(type);
+                    // Get type specific data
+                    if (type == "Table")
+                    {
+                        tableStringData = new List<List<String>>();
+                        foreach (List<TextBox> data in tableData)
+                        {
+                            tableStringData.Add(new List<string>());
+                            foreach (TextBox textBox in data)
+                            {
+                                tableStringData.Last().Add(textBox.Text);
+                            }
+                        }
+                    }
+                    else if (type == "Paragraph")
+                    {
+                        elements[id].setBody(body.Text);
+                    }
+                    else if (type == "List")
+                    {
+                        List<string> listItems = new List<string>();
+                        foreach (TextBox text in listTextBox)
+                        {
+                            listItems.Add(text.Text);
+                        }
+                        elements[id].setListItems(listItems);
+                    }
+                    else if (type == "Figure")
+                    {
+                        if (smallImage.IsChecked == true)
+                        {
+                            elements[id].SetImageSize(0);
+                        }
+                        else if (mediumImage.IsChecked == true)
+                        {
+                            elements[id].SetImageSize(1);
+                        }
+                        else
+                        {
+                            elements[id].SetImageSize(2);
+                        }
+                        elements[id].setImagLoc(selectedFile);
+
+                    }   
+                }
+                // Update element list
+
+                // Return true
+                return true;
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return false;
+            }
+
         }
     }
 }

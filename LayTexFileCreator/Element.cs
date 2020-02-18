@@ -15,27 +15,26 @@ namespace LayTexFileCreator
         int ImageSize = 1;
 
 
-        List<string> data;
+        List<string> listItems;
         List<List<string>> TableContents { get; set; }
 
 
         public Element()
         {
             title = "";
-            data = new List<string>();
+            listItems = new List<string>();
         }
 
         public Element(string c, string d)
         {
-            data = new List<string>();
+            listItems = new List<string>();
             this.title = c;
-            this.data.Add(d);
         }
 
         public Element(string currentTitle, List<string> data)
         {
             this.title = currentTitle;
-            this.data = data;
+            this.listItems = data;
         }
 
         public string getElementType()
@@ -51,20 +50,10 @@ namespace LayTexFileCreator
             Console.WriteLine(this.title);
             return this.title;
         }
-        public List<string> GetData()
-        {
-            return this.data;
-        }
+
         public void SetTitle(string str)
         {
             this.title = str;
-        }
-        public void SetData(int pos, string str)
-        {
-            if (this.data.Count() > pos)
-            {
-                data[pos] = str;
-            }
         }
 
         public void SetImageSize(int v)
@@ -75,6 +64,25 @@ namespace LayTexFileCreator
         public void setImagLoc(string filePath)
         {
             this.ImageLoc = filePath;
+        }
+
+        internal void setBody(string text)
+        {
+            this.Body = text;
+        }
+
+        internal void setListItems(List<string> listItems)
+        {
+            this.listItems = listItems;
+        }
+        internal List<string> getListItems()
+        {
+            return this.listItems;
+        }
+
+        internal string GetBody()
+        {
+            return this.Body;
         }
     }
 }
