@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Json;
 using System.Security;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,6 +17,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace LayTexFileCreator
 {
@@ -25,6 +28,10 @@ namespace LayTexFileCreator
     public partial class MainWindow : Window
     {
         List<Element> elements;
+        Page page = new Page();
+        Window popup = new Window();
+        Grid popupGrid = new Grid();
+
         // Create wpf elements
         TextBox title = new TextBox(), body = new TextBox();
         Grid grid = new Grid();
@@ -32,6 +39,7 @@ namespace LayTexFileCreator
         Button deleteBtn = new Button(), addBtn = new Button();
         int selectedId = 0;
         string currentTitle = "", currentBody = "";
+
         // List item
         List<TextBox> listTextBox = new List<TextBox>();
         ListBox listBox = new ListBox();
@@ -43,13 +51,20 @@ namespace LayTexFileCreator
         RadioButton mediumImage = new RadioButton();
         RadioButton largeImage = new RadioButton();
         string selectedFile = "";
+        
         // Table
         List<List<TextBox>> tableData = new List<List<TextBox>>();
         List<List<String>> tableStringData = new List<List<String>>();
         Grid tableGrid = new Grid();
-        Button addColumnBtn = new Button(), addRowBtn = new Button(),
-            removeColumnBtn = new Button(), removeRowBtn = new Button();
-        
+        Button addColumnBtn = new Button(), addRowBtn = new Button(), removeColumnBtn = new Button(), removeRowBtn = new Button();
+        ListBox tableArea = new ListBox();
+
+        // Save Dialog
+        Label popupTitle = new Label(); 
+        Button saveButton = new Button(), cancelButton = new Button();
+        TextBox popupTextbox = new TextBox();
+
+
         public MainWindow()
         {
             InitializeComponent();
@@ -135,11 +150,116 @@ namespace LayTexFileCreator
             //reset page
             elements.Clear();
             UpdateElementList();
+            InitlizeParagraph("-1");
         }
         private void SaveItem_Click(object sender, RoutedEventArgs e)
         {
+            if (page.GetDateCreated() == null)
+            {
+                page.SetDateCreated(DateTime.Now.ToString("h:mm:ss tt"));
+            }
+            page.SetdateEdited(DateTime.Now.ToString("h:mm:ss tt"));
+            page.SetElements(elements);
+            string name = "";
+            popup = new Window();
+            popup.Width = 300;
+            popup.Height = 130;
+            popup.Background = Brushes.LightGray;
+            
+            
 
+
+            popupTitle.Content = "Page Title";
+            popupTitle.HorizontalAlignment = HorizontalAlignment.Center;
+            popupTitle.Margin = new Thickness(-20, 5, 0, 0);
+            popupTextbox.Text = "";
+            popupTextbox.Width = popup.Width-35;
+            popupTextbox.HorizontalAlignment = HorizontalAlignment.Center;
+            popupTextbox.Margin = new Thickness(-20,5,0,0);
+            saveButton.Width = 50;
+            saveButton.Height = 25;
+            saveButton.Content = "Save";
+            saveButton.HorizontalAlignment = HorizontalAlignment.Left;
+            saveButton.Margin = new Thickness(8,5, 0, 0);
+            saveButton.Click += SaveElements_Click;
+            cancelButton.Width = 50;
+            cancelButton.Height = 25;
+            cancelButton.Content = "Cancel";
+            cancelButton.HorizontalAlignment = HorizontalAlignment.Right;
+            cancelButton.Margin = new Thickness(0,5,27,0);
+            cancelButton.Click += CancelPopup_Click;
+
+
+            popupGrid.Children.Clear();
+            popupGrid.Width = popup.Width;
+            popupGrid.Height = popup.Height;
+
+            RowDefinition row;
+            popupGrid.RowDefinitions.Clear();
+            row = new RowDefinition();
+            row.Height = new GridLength(25, GridUnitType.Auto);
+            popupGrid.RowDefinitions.Add(row);
+            row = new RowDefinition();
+            row.Height = new GridLength(25, GridUnitType.Auto);
+            popupGrid.RowDefinitions.Add(row);
+            row = new RowDefinition();
+            row.Height = new GridLength(25, GridUnitType.Auto);
+            popupGrid.RowDefinitions.Add(row);
+
+            Grid.SetRow(popupTitle, 0);
+            popupGrid.Children.Add(popupTitle);
+            Grid.SetRow(popupTextbox, 1);
+            popupGrid.Children.Add(popupTextbox);
+            Grid.SetRow(saveButton, 2);
+            popupGrid.Children.Add(saveButton);
+            Grid.SetRow(cancelButton, 2);
+            popupGrid.Children.Add(cancelButton);
+
+            popup.Content = popupGrid;
+
+            popup.Show();
+            page.Setname(name);
+           
         }
+
+        private void CancelPopup_Click(object sender, RoutedEventArgs e)
+        {
+            popup.Close();
+        }
+
+        private void SaveElements_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                //saveFileDialog = new SaveFileDialog();
+                if (popupTextbox.Text != "")
+                {
+                    page.Setname(popupTextbox.Text);
+                    SaveFileDialog saveFileDialog = new SaveFileDialog();
+                    saveFileDialog.Filter = "Xml file|*.xml";
+                    saveFileDialog.Title = "Save a page data File";
+                    saveFileDialog.FileName = popupTextbox.Text + ".xml";
+
+                    saveFileDialog.ShowDialog();
+                    XmlDocument xmlDocument = new XmlDocument();
+                    XmlSerializer serializer = new XmlSerializer(typeof(Page));
+                    using (MemoryStream stream = new MemoryStream())
+                    {
+                        serializer.Serialize(stream, page);
+                        stream.Position = 0;
+                        xmlDocument.Load(stream);
+                        xmlDocument.Save(saveFileDialog.FileName);
+                    }
+                    popup.Close();
+                    
+                }
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
         private void OpenItem_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
@@ -502,27 +622,27 @@ namespace LayTexFileCreator
             removeRowBtn.Click += RemoveRowBtn_Click;  //AddGridColoums;
             removeRowBtn.Height = 25;
             removeRowBtn.HorizontalAlignment = HorizontalAlignment.Right;
-            removeRowBtn.Margin = new Thickness(0, 0, 10, 0);
+            removeRowBtn.Margin = new Thickness(0, 10, 11, 0);
 
             removeColumnBtn.Width = 100;
             removeColumnBtn.Content = "Remove Column";
             removeColumnBtn.Click += RemoveColumnBtn_Click; //AddGridColoums;
             removeColumnBtn.Height = 25;
-            removeColumnBtn.Margin = new Thickness(130, 0, 0, 0);
+            removeColumnBtn.Margin = new Thickness(130, 10, 0, 0);
             removeColumnBtn.HorizontalAlignment = HorizontalAlignment.Left;
 
             addRowBtn.Width = 100;
             addRowBtn.Content = "Add Row";
             addRowBtn.Click += AddRowBtn_Click;  //AddGridColoums;
             addRowBtn.Height = 25;
-            addRowBtn.Margin = new Thickness(0, 0, 130, 0);
+            addRowBtn.Margin = new Thickness(0, 10, 135, 0);
             addRowBtn.HorizontalAlignment = HorizontalAlignment.Right;
 
             addColumnBtn.Width = 100;
             addColumnBtn.Content = "Add Column";
             addColumnBtn.Click += AddColumnBtn_Click;  //AddGridColoums;
             addColumnBtn.Height = 25;
-            addColumnBtn.Margin = new Thickness(10, 0, 0, 0);
+            addColumnBtn.Margin = new Thickness(5, 10, 0, 0);
             addColumnBtn.HorizontalAlignment = HorizontalAlignment.Left;
 
             //
@@ -530,6 +650,13 @@ namespace LayTexFileCreator
             listBox.Background = Brushes.FloralWhite;
             listBox.Margin = new Thickness(5);
             listBox.HorizontalAlignment = HorizontalAlignment.Center;
+
+
+            tableArea.Height = 200;
+            tableArea.Background = Brushes.White;
+            tableArea.Margin = new Thickness(5);
+            tableArea.HorizontalAlignment = HorizontalAlignment.Left;
+            tableArea.Width = sv.Width - 40;
         }
         private void AddRowBtn_Click(object sender, RoutedEventArgs e)
         {
@@ -597,21 +724,21 @@ namespace LayTexFileCreator
             smallImage.IsChecked = false;
             smallImage.GroupName = "imageSize";
             smallImage.Tag = 0;
-            smallImage.Click += updateImageSize;
+            smallImage.Click += UpdateImageSize;
             smallImage.HorizontalAlignment = HorizontalAlignment.Left;
             mediumImage = new RadioButton();
             mediumImage.Content = "Medium";
             mediumImage.IsChecked = true;
             mediumImage.GroupName = "imageSize";
             mediumImage.Tag = 1;
-            mediumImage.Click += updateImageSize;
+            mediumImage.Click += UpdateImageSize;
             mediumImage.HorizontalAlignment = HorizontalAlignment.Center;
             largeImage = new RadioButton();
             largeImage.Content = "Large";
             largeImage.IsChecked = false;
             largeImage.GroupName = "imageSize";
             largeImage.Tag = 2;
-            largeImage.Click += updateImageSize;
+            largeImage.Click += UpdateImageSize;
             largeImage.HorizontalAlignment = HorizontalAlignment.Right;
             uploadButton = new Button();
             uploadButton.Width = 50;
@@ -645,7 +772,29 @@ namespace LayTexFileCreator
             //add grid to gui
             sv.Content = grid;
             //add data to figure if avalible
+            if(selectedId != -1)
+            {
+                title.Text = elements[selectedId].GetTitle();
+                switch (elements[selectedId].GetImageSize())
+                {
+                    case 0:
+                        smallImage.IsChecked = true;
+                        largeImage.IsChecked = false;
+                        mediumImage.IsChecked = false;
+                        break;
+                    case 2:
+                        largeImage.IsChecked = true;
+                        smallImage.IsChecked = false;
+                        mediumImage.IsChecked = false;
+                        break;
+                    default:
+                        mediumImage.IsChecked = true;
+                        smallImage.IsChecked = false;
+                        largeImage.IsChecked = false;
+                        break;
+                }
 
+            }
         }
         private void OpenImageUploadDialog(object sender, RoutedEventArgs e)
         {
@@ -665,7 +814,7 @@ namespace LayTexFileCreator
 
             }
         }
-        private void updateImageSize(object sender, RoutedEventArgs e)
+        private void UpdateImageSize(object sender, RoutedEventArgs e)
         {
             RadioButton button = (RadioButton)sender;
             elements[selectedId].SetImageSize(int.Parse(button.Tag.ToString()));
@@ -695,23 +844,29 @@ namespace LayTexFileCreator
             title.SpellCheck.IsEnabled = true;
             title.TextWrapping = 0;
 
-            int totalRows = tableData.Count();
-            int totalColoums = 0;
+            int totalRows = tableData.Count(), totalColoums = 0, tmpInt = 0;
             if (totalRows > 0)
             {
                 totalColoums = tableData[0].Count();
             }
-            tableGrid =  AddTableGrid(totalRows, totalColoums);
-            // Now that grid is there add all the textboxs to the grid and content 
-           // tableStringData = elements[selectedId].getListItems();
+            List<Grid> tmpGrid = new List<Grid>();
+            while (tmpInt < totalRows)
+            {
+                tmpInt++;
+                tmpGrid.Add(AddTableGrid(totalColoums));
+            }
+
+            TextBox tmpText;
+            // Now that grid is there add all the textboxs to the grid and content
             for (int rows = 0; rows < totalRows; rows++)
             {
                 for (int columns = 0; columns < totalColoums; columns++)
                 {
-                    tableData[rows][columns].Text = tableStringData[rows][columns];
-                    //textBox.Text = "";
-                    tableData[rows][columns].Width = tableGrid.Width-20;
-                    tableData[rows][columns].Height = 20;
+                    tmpText = new TextBox();
+                    tmpText.Width = 50;
+                    tmpText.Text = tableStringData[rows][columns];
+                    Grid.SetColumn(tmpText, columns);
+                    tmpGrid[columns].Children.Add(tmpText);
                 }
             }
             
@@ -727,8 +882,8 @@ namespace LayTexFileCreator
             grid.Children.Add(removeRowBtn);
             Grid.SetRow(removeColumnBtn, 2);
             grid.Children.Add(removeColumnBtn);
-            Grid.SetRow(tableGrid, 3);
-            grid.Children.Add(tableGrid);
+            Grid.SetRow(tableArea, 3);
+            grid.Children.Add(tableArea);
             Grid.SetRow(addBtn, 4);
             grid.Children.Add(addBtn);
             Grid.SetRow(deleteBtn, 4);
@@ -738,24 +893,15 @@ namespace LayTexFileCreator
 
 
         }
-        private Grid AddTableGrid(int totalRows, int totalColoums)
-        {
+        private Grid AddTableGrid(int totalColoums)
+        {   
             Grid tGrid = new Grid();
             tGrid.Width = totalColoums * 100;
-            tGrid.Height = totalRows * 25;
+            tGrid.Height = 25;
             tGrid.Background = Brushes.Pink;
-            RowDefinition row;
             ColumnDefinition column;
             tGrid.ColumnDefinitions.Clear();
-            tGrid.RowDefinitions.Clear();
 
-            while (totalRows > 0)
-            {
-                row = new RowDefinition();
-                totalRows--;
-                row.Height = new GridLength(25, GridUnitType.Auto);
-                tGrid.RowDefinitions.Add(row);
-            }
             while (totalColoums > 0)
             {
                 column = new ColumnDefinition();

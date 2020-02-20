@@ -12,7 +12,8 @@ namespace LayTexFileCreator
         // Config Values
        Brush BACKGROUND_COLOR = Brushes.AntiqueWhite;
        Brush CONTROL_COLOR = Brushes.AntiqueWhite;
-        
+       Brush GUI_COLOR = Brushes.FloralWhite;
+       
 
         public Config() { }
     }

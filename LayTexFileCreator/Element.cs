@@ -8,15 +8,13 @@ namespace LayTexFileCreator
 {
     public class Element
     {
-        string title;// { get; set; }
-        string Body { get; set; }
-        string ImageLoc { get; set; }
-        string ElementType { get; set; }
-        int ImageSize = 1;
-
-
-        List<string> listItems;
-        List<List<string>> TableContents { get; set; }
+        public string title;// { get; set; }
+        public string Body { get; set; }
+        public string ImageLoc { get; set; }
+        public string ElementType { get; set; }
+        public int ImageSize = 1;
+        public List<string> listItems;
+        public List<List<string>> TableContents { get; set; }
 
 
         public Element()
@@ -60,7 +58,10 @@ namespace LayTexFileCreator
         {
             this.ImageSize = v;
         }
-
+        public int GetImageSize()
+        {
+            return this.ImageSize;
+        }
         public void setImagLoc(string filePath)
         {
             this.ImageLoc = filePath;
@@ -83,6 +84,15 @@ namespace LayTexFileCreator
         internal string GetBody()
         {
             return this.Body;
+        }
+
+        internal string GetImageLocation()
+        {
+            return this.ImageLoc;
+        }
+        internal void SetImageLocation(string loc)
+        {
+            this.ImageLoc = loc;
         }
     }
 }
