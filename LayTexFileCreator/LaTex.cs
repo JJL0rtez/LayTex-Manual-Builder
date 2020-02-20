@@ -10,12 +10,12 @@ namespace LayTexFileCreator
     {
         public string CompilePage(Page page)
         {
-            return "";
+            return page.ToString();
         }
 
         public void CompileBook(List<string> pages)
         {
-
+            pages.Add("");
         }
 
 

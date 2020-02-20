@@ -4,30 +4,30 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Runtime.Serialization.Json;
-using System.Security;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Xml;
 using System.Xml.Serialization;
 
 namespace LayTexFileCreator
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
+        // Config / Settings
+        Config config = new Config();
+
         List<Element> elements;
+
+        // Sorting elements vars
+        List<Element> sortedElements = new List<Element>();
+        List<Button> lastSelectedButton = new List<Button>(), lastSelectedButtonSorted = new List<Button>();
+        int lastSelectedButtonBefore = 0, lastSelectedButtonAfter = 0;
+        Button removeElementBtn = new Button(), moveUpBtn = new Button(),
+            moveDownBtn = new Button(), removeAllElementBtn = new Button(),
+            addAllElementBtn = new Button(), addSelectedElement = new Button();
+
         Page page = new Page();
         Window popup = new Window();
         Grid popupGrid = new Grid();
@@ -38,7 +38,7 @@ namespace LayTexFileCreator
         Label titleLabel = new Label(), bodyLabel = new Label();
         Button deleteBtn = new Button(), addBtn = new Button();
         int selectedId = 0;
-        string currentTitle = "", currentBody = "";
+       //string currentTitle = "", currentBody = "";
 
         // List item
         List<TextBox> listTextBox = new List<TextBox>();
@@ -64,6 +64,8 @@ namespace LayTexFileCreator
         Button saveButton = new Button(), cancelButton = new Button();
         TextBox popupTextbox = new TextBox();
 
+        //
+        ListBox scrollViewerBefore, scrollViewerAfter;
 
         public MainWindow()
         {
@@ -85,24 +87,25 @@ namespace LayTexFileCreator
         }
         private void UpdateBody(object sender, TextChangedEventArgs e)
         {
-            if (body.Text != "")
-            {
-                currentBody = body.Text;
-            }
+            //if (body.Text != "")
+            //{
+            //    currentBody = body.Text;
+            //}
         }
         private void UpdateTitle(object sender, TextChangedEventArgs e)
         {
-            if (title.Text != "")
-            {
-                currentTitle = title.Text;
-            }
+          //  if (title.Text != "")
+         //   {
+                //currentTitle = title.Text;
+          //  }
         }
         private void AddClick(object sender, RoutedEventArgs e)
         {
             Button button = (Button)sender;
             string[] strlist = button.Tag.ToString().Split(',');
             SaveData(strlist[0],int.Parse(strlist[1]));
-            UpdateElementList();  
+            UpdateElementList();
+            addBtn.Content = "Update Element";
         }
         private void PushItem_Click(object sender, RoutedEventArgs e)
         {
@@ -121,9 +124,9 @@ namespace LayTexFileCreator
         }
         private void AddFigure_Click(object sender, RoutedEventArgs e)
         {
-            Button button = (Button)sender;
+            //Button button = (Button)sender;
             //elements.Add(new Element());
-            InitlizeFigure(elements.Count() - 1);
+            InitlizeFigure(-1);
         }
         private void DeleteClick(object sender, RoutedEventArgs e)
         {
@@ -151,6 +154,8 @@ namespace LayTexFileCreator
             elements.Clear();
             UpdateElementList();
             InitlizeParagraph("-1");
+            title.Text = "";
+            body.Text = "";
         }
         private void SaveItem_Click(object sender, RoutedEventArgs e)
         {
@@ -161,13 +166,12 @@ namespace LayTexFileCreator
             page.SetdateEdited(DateTime.Now.ToString("h:mm:ss tt"));
             page.SetElements(elements);
             string name = "";
-            popup = new Window();
-            popup.Width = 300;
-            popup.Height = 130;
-            popup.Background = Brushes.LightGray;
-            
-            
-
+            popup = new Window
+            {
+                Width = 300,
+                Height = 130,
+                Background = Brushes.LightGray
+            };
 
             popupTitle.Content = "Page Title";
             popupTitle.HorizontalAlignment = HorizontalAlignment.Center;
@@ -196,14 +200,20 @@ namespace LayTexFileCreator
 
             RowDefinition row;
             popupGrid.RowDefinitions.Clear();
-            row = new RowDefinition();
-            row.Height = new GridLength(25, GridUnitType.Auto);
+            row = new RowDefinition
+            {
+                Height = new GridLength(25, GridUnitType.Auto)
+            };
             popupGrid.RowDefinitions.Add(row);
-            row = new RowDefinition();
-            row.Height = new GridLength(25, GridUnitType.Auto);
+            row = new RowDefinition
+            {
+                Height = new GridLength(25, GridUnitType.Auto)
+            };
             popupGrid.RowDefinitions.Add(row);
-            row = new RowDefinition();
-            row.Height = new GridLength(25, GridUnitType.Auto);
+            row = new RowDefinition
+            {
+                Height = new GridLength(25, GridUnitType.Auto)
+            };
             popupGrid.RowDefinitions.Add(row);
 
             Grid.SetRow(popupTitle, 0);
@@ -221,13 +231,131 @@ namespace LayTexFileCreator
             page.Setname(name);
            
         }
+        private void SaveItemSorted_Click(object sender, RoutedEventArgs e)
+        {
+            if (page.GetDateCreated() == null)
+            {
+                page.SetDateCreated(DateTime.Now.ToString("h:mm:ss tt"));
+            }
+            page.SetdateEdited(DateTime.Now.ToString("h:mm:ss tt"));
+            page.SetElements(sortedElements);
+            string name = "";
+            popup = new Window
+            {
+                Width = 300,
+                Height = 130,
+                Background = Brushes.LightGray
+            };
 
+            popupTitle.Content = "Page Title";
+            popupTitle.HorizontalAlignment = HorizontalAlignment.Center;
+            popupTitle.Margin = new Thickness(-20, 5, 0, 0);
+            popupTextbox.Text = "";
+            popupTextbox.Width = popup.Width - 35;
+            popupTextbox.HorizontalAlignment = HorizontalAlignment.Center;
+            popupTextbox.Margin = new Thickness(-20, 5, 0, 0);
+            saveButton.Width = 50;
+            saveButton.Height = 25;
+            saveButton.Content = "Save";
+            saveButton.HorizontalAlignment = HorizontalAlignment.Left;
+            saveButton.Margin = new Thickness(8, 5, 0, 0);
+            saveButton.Click += SaveElements_Click;
+            cancelButton.Width = 50;
+            cancelButton.Height = 25;
+            cancelButton.Content = "Cancel";
+            cancelButton.HorizontalAlignment = HorizontalAlignment.Right;
+            cancelButton.Margin = new Thickness(0, 5, 27, 0);
+            cancelButton.Click += CancelPopup_Click;
+
+
+            popupGrid.Children.Clear();
+            popupGrid.Width = popup.Width;
+            popupGrid.Height = popup.Height;
+
+            RowDefinition row;
+            popupGrid.RowDefinitions.Clear();
+            row = new RowDefinition
+            {
+                Height = new GridLength(25, GridUnitType.Auto)
+            };
+            popupGrid.RowDefinitions.Add(row);
+            row = new RowDefinition
+            {
+                Height = new GridLength(25, GridUnitType.Auto)
+            };
+            popupGrid.RowDefinitions.Add(row);
+            row = new RowDefinition
+            {
+                Height = new GridLength(25, GridUnitType.Auto)
+            };
+            popupGrid.RowDefinitions.Add(row);
+
+            Grid.SetRow(popupTitle, 0);
+            popupGrid.Children.Add(popupTitle);
+            Grid.SetRow(popupTextbox, 1);
+            popupGrid.Children.Add(popupTextbox);
+            Grid.SetRow(saveButton, 2);
+            popupGrid.Children.Add(saveButton);
+            Grid.SetRow(cancelButton, 2);
+            popupGrid.Children.Add(cancelButton);
+
+            popup.Content = popupGrid;
+
+            popup.Show();
+            page.Setname(name);
+        }
+        private void OpenItemSorted_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            if (openFileDialog.ShowDialog() == true)
+            {
+                System.Xml.Serialization.XmlSerializer reader = new System.Xml.Serialization.XmlSerializer(typeof(Page));
+                System.IO.StreamReader file = new System.IO.StreamReader(openFileDialog.FileName);
+                page = (Page)reader.Deserialize(file);
+                file.Close();
+                elements = page.GetElements();
+                UpdateElementList();
+                InitlizeParagraph("-1");
+                title.Text = "";
+                body.Text = "";
+                Button last;
+                int tmpId = 0;
+                lastSelectedButton = new List<Button>();
+                foreach (Element el in elements)
+                {
+
+                    last = new Button
+                    {
+                        Content = "(" + el.GetElementType() + ") " +  el.GetTitle(),
+                        Tag = tmpId,
+                        Width = scrollViewerBefore.Width - 20,
+                        Height = 25
+                    };
+                    last.Click += SetBeforeSelection_Click;
+                    lastSelectedButton.Add(last);
+                    scrollViewerBefore.Items.Add(last);
+                    tmpId++;
+                }
+            }
+        }
+        private void SetBeforeSelection_Click(object sender, RoutedEventArgs e)
+        {
+            Button button = (Button)sender;
+            foreach(Button b in lastSelectedButton){
+                b.Background = Brushes.White;
+            }
+            lastSelectedButton[int.Parse(button.Tag.ToString())].Background = config.ACCENT_COLOR;
+            lastSelectedButtonBefore = int.Parse(button.Tag.ToString());
+        }
         private void CancelPopup_Click(object sender, RoutedEventArgs e)
         {
             popup.Close();
         }
-
         private void SaveElements_Click(object sender, RoutedEventArgs e)
+        {
+            DoDialogSavePage();
+        }
+        private void DoDialogSavePage()
         {
             try
             {
@@ -235,10 +363,12 @@ namespace LayTexFileCreator
                 if (popupTextbox.Text != "")
                 {
                     page.Setname(popupTextbox.Text);
-                    SaveFileDialog saveFileDialog = new SaveFileDialog();
-                    saveFileDialog.Filter = "Xml file|*.xml";
-                    saveFileDialog.Title = "Save a page data File";
-                    saveFileDialog.FileName = popupTextbox.Text + ".xml";
+                    SaveFileDialog saveFileDialog = new SaveFileDialog
+                    {
+                        Filter = "Xml file|*.xml",
+                        Title = "Save a page data File",
+                        FileName = popupTextbox.Text + ".xml"
+                    };
 
                     saveFileDialog.ShowDialog();
                     XmlDocument xmlDocument = new XmlDocument();
@@ -251,21 +381,30 @@ namespace LayTexFileCreator
                         xmlDocument.Save(saveFileDialog.FileName);
                     }
                     popup.Close();
-                    
+
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
             }
         }
-
         private void OpenItem_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
             if (openFileDialog.ShowDialog() == true)
             {
-                File.ReadAllLines(openFileDialog.FileName);
+                System.Xml.Serialization.XmlSerializer reader = new System.Xml.Serialization.XmlSerializer(typeof(Page));
+                System.IO.StreamReader file = new System.IO.StreamReader(openFileDialog.FileName);
+                page = (Page)reader.Deserialize(file);
+                file.Close();
+                elements = page.GetElements();
+                UpdateElementList();
+                InitlizeParagraph("-1");
+                title.Text = "";
+                body.Text = "";
+
+                //File.ReadAllLines(openFileDialog.FileName);
             }
          //       txtEditor.Text = File.ReadAllText(openFileDialog.FileName);
         }
@@ -273,7 +412,7 @@ namespace LayTexFileCreator
         {
             System.Windows.Application.Current.Shutdown();
         }
-        private void SelectChapterFolder_Click(object sender, RoutedEventArgs e)
+        private void OpenBookMode_Click(object sender, RoutedEventArgs e)
         {
 
         }
@@ -293,7 +432,7 @@ namespace LayTexFileCreator
             GroupBox groupBox = new GroupBox();
             Grid grid = new Grid(), gridMain = new Grid();
             groupBox.Width = subWindow.Width - 20;
-            groupBox.Height = subWindow.Height - 60;
+            groupBox.Height = subWindow.Height - 160;
             groupBox.VerticalAlignment = VerticalAlignment.Center;
             groupBox.HorizontalAlignment = HorizontalAlignment.Center;
             groupBox.Header = "Page Order Selector";
@@ -313,62 +452,105 @@ namespace LayTexFileCreator
             gridMain.HorizontalAlignment = HorizontalAlignment.Center;
             //grid.Margin = new Thickness(5);
             // Add selector controls
-            ScrollViewer scrollViewerBefore = new ScrollViewer();
-            scrollViewerBefore.Height = subWindow.Height - 100;
-            scrollViewerBefore.Width = subWindow.Width / 2 - 30;
-            scrollViewerBefore.HorizontalAlignment = HorizontalAlignment.Left;
-            scrollViewerBefore.VerticalAlignment = VerticalAlignment.Center;
-            scrollViewerBefore.Background = Brushes.AntiqueWhite;
-            scrollViewerBefore.Margin = new Thickness(1);
-            ScrollViewer scrollViewerAfter = new ScrollViewer();
-            scrollViewerAfter.Height = subWindow.Height - 100;
-            scrollViewerAfter.Width = subWindow.Width / 2 - 30;
-            scrollViewerAfter.HorizontalAlignment = HorizontalAlignment.Right;
-            scrollViewerAfter.VerticalAlignment = VerticalAlignment.Center;
-            scrollViewerAfter.Background = Brushes.AntiqueWhite;
-            scrollViewerAfter.Margin = new Thickness(1);
+            scrollViewerBefore = new ListBox
+            {
+                Height = grid.Height - 20,
+                Width = subWindow.Width / 2 - 30,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Center,
+                Background = Brushes.AntiqueWhite,
+                Margin = new Thickness(1)
+            };
+            scrollViewerAfter = new ListBox
+            {
+                Height = subWindow.Height - 200,
+                Width = subWindow.Width / 2 - 30,
+                HorizontalAlignment = HorizontalAlignment.Right,
+                VerticalAlignment = VerticalAlignment.Center,
+                Background = Brushes.AntiqueWhite,
+                Margin = new Thickness(1)
+            };
 
-            List<Button> beforeList = new List<Button>();
-            List<Button> afterList = new List<Button>();
-            Menu menu = new Menu();
-            menu.Margin = new Thickness(5, 20, 0, 0);
-            MenuItem saveMenuItem = new MenuItem();
-            saveMenuItem.Header = " Save";
-            MenuItem loadMenuItem = new MenuItem();
-            loadMenuItem.Header = "Load";
-            MenuItem pageView = new MenuItem();
-            pageView.Header = " View Page Mode";
-            MenuItem chapterView = new MenuItem();
-            chapterView.Header = " View Chapter Mode";
-            MenuItem file = new MenuItem();
-            file.Header = " File";
-            MenuItem page = new MenuItem();
-            page.Header = " Page View";
-            MenuItem chapter = new MenuItem();
-            chapter.Header = " Chapter View";
+            //  List<Button> beforeList = new List<Button>();
+            //  List<Button> afterList = new List<Button>();
+            Menu menu = new Menu
+            {
+                Margin = new Thickness(5, 20, 0, 0)
+            };
+            MenuItem file = new MenuItem
+            {
+                Header = " File"
+            };
+            MenuItem saveMenuItem = new MenuItem
+            {
+                Header = " Save"
+            };
+            saveMenuItem.Click += SaveItemSorted_Click;
+            MenuItem loadMenuItem = new MenuItem
+            {
+                Header = " Load"
+            };
+            loadMenuItem.Click += OpenItemSorted_Click;
+
+            MenuItem bookView = new MenuItem
+            {
+                Header = " View Book Mode"
+            };
+            MenuItem chapterView = new MenuItem
+            {
+                Header = " View Chapter Mode"
+            };
+            MenuItem modes = new MenuItem
+            {
+                Header = " Modes"
+            };
 
             //menu.Background = Brushes.Red;
             menu.Items.Insert(0, file);
-            menu.Items.Insert(1, page);
-            menu.Items.Insert(2, chapter);
+            menu.Items.Insert(1, modes);
             file.Items.Insert(0, saveMenuItem);
             file.Items.Insert(1, loadMenuItem);
-            page.Items.Insert(0, pageView);
-            chapter.Items.Insert(0, chapterView);
+            modes.Items.Insert(0, chapterView);
+            modes.Items.Insert(0, bookView);
 
             RowDefinition row;
             gridMain.RowDefinitions.Clear();
-            row = new RowDefinition();
-            row.Height = new GridLength(25, GridUnitType.Auto);
+            row = new RowDefinition
+            {
+                Height = new GridLength(25, GridUnitType.Auto)
+            };
             gridMain.RowDefinitions.Add(row);
-            row = new RowDefinition();
-            row.Height = new GridLength(25, GridUnitType.Auto);
+            row = new RowDefinition
+            {
+                Height = new GridLength(25, GridUnitType.Auto)
+            };
             gridMain.RowDefinitions.Add(row);
-
+            row = new RowDefinition
+            {
+                Height = new GridLength(25, GridUnitType.Auto)
+            };
+            gridMain.RowDefinitions.Add(row);
+             
             Grid.SetRow(menu, 0);
             gridMain.Children.Add(menu);
-            Grid.SetRow(groupBox, 1);
+            Grid.SetRow(removeElementBtn, 1);
+            gridMain.Children.Add(removeElementBtn);
+            Grid.SetRow(moveUpBtn, 1);
+            gridMain.Children.Add(moveUpBtn);
+            Grid.SetRow(moveDownBtn, 1);
+            gridMain.Children.Add(moveDownBtn);
+            Grid.SetRow(removeAllElementBtn, 1);
+            gridMain.Children.Add(removeAllElementBtn);
+            Grid.SetRow(addAllElementBtn, 1);
+            gridMain.Children.Add(addAllElementBtn);
+            Grid.SetRow(addSelectedElement, 1);
+            gridMain.Children.Add(addSelectedElement);
+            Grid.SetRow(groupBox, 2);
             gridMain.Children.Add(groupBox);
+
+            //removeElementBtn = new Button(), moveUpBtn = new Button(),
+            //moveDownBtn = new Button(), removeAllElementBtn = new Button(),
+            //addAllElementBtn = new Button(), addSelectedElement = new Button();
 
             groupBox.Content = grid;
 
@@ -383,10 +565,12 @@ namespace LayTexFileCreator
             elementSV.Items.Clear();
             foreach (Element element in elements)
             {
-                elementNameBttn = new Button();
-                elementNameBttn.Tag = element.getElementType() + "," + i;
+                elementNameBttn = new Button
+                {
+                    Tag = element.GetElementType() + "," + i
+                };
                 elementNameBttn.Click += Element_click;
-                elementNameBttn.Content =  "(" + element.getElementType() + ") " +  element.GetTitle();
+                elementNameBttn.Content =  "(" + element.GetElementType() + ") " +  element.GetTitle();
                 elementNameBttn.Width = elementSV.Width - 10;
                 i++;
                 elementSV.Items.Add(elementNameBttn);
@@ -430,6 +614,10 @@ namespace LayTexFileCreator
             addBtn.Tag = "List," + id;
             deleteBtn.Tag = "List," + id;
             titleLabel.Content = "List Title";
+            if (id == "-1" && listTextBox.Count() < 1)
+            {
+                title.Text = "";
+            }
            // title.Text = "";
             //initlize listS
             grid.Children.Clear();
@@ -447,12 +635,24 @@ namespace LayTexFileCreator
 
             TextBox tmp = new TextBox();
             listBox.Items.Clear();
+            if (idNum != -1)
+            {
+                while (listTextBox.Count() < elements[idNum].GetListItems().Count())
+                {
+                    listTextBox.Add(new TextBox());
+                }
+            }
+
             for (int i = 0; i < listTextBox.Count(); i++)
             {
                 tmp = new TextBox();
                 tmp = listTextBox.ElementAt(i);
-                tmp.Name = "listItemTextBox" + i;
-                
+                if (idNum != -1 && i < elements[idNum].GetListItems().Count())
+                {
+                    tmp.Text = elements[idNum].GetListItems()[i];
+                }
+                    tmp.Name = "listItemTextBox" + i;
+
                 tmp.Width = sv.Width - 50;
                 tmp.Height = 20;
                 tmp.Background = Brushes.AntiqueWhite;
@@ -502,7 +702,7 @@ namespace LayTexFileCreator
             {
                 listTextBox.Add(new TextBox());
                 InitlizeList(selectedId.ToString());
-                int tag = int.Parse(textBox.Tag.ToString());
+                //int tag = int.Parse(textBox.Tag.ToString());
             }
         }
         private void InitlizeParagraph(string id)
@@ -657,11 +857,152 @@ namespace LayTexFileCreator
             tableArea.Margin = new Thickness(5);
             tableArea.HorizontalAlignment = HorizontalAlignment.Left;
             tableArea.Width = sv.Width - 40;
+
+            //Sorted view
+            moveUpBtn.Width = 75;
+            moveUpBtn.Height = 25;
+            moveUpBtn.Content = "Move Up";
+            moveUpBtn.Click += MoveElementUp_Click;
+            moveUpBtn.HorizontalAlignment = HorizontalAlignment.Right;
+            moveUpBtn.Margin = new Thickness(0, 10, 15, 0);
+
+            moveDownBtn.Width = 75;
+            moveDownBtn.Height = 25;
+            moveDownBtn.Content = "Move Down";
+            moveDownBtn.Click += MoveElementDown_Click;
+            moveDownBtn.HorizontalAlignment = HorizontalAlignment.Right;
+            moveDownBtn.Margin = new Thickness(0, 10, 155, 0);
+
+            removeElementBtn.Width = 75;
+            removeElementBtn.Height = 25;
+            removeElementBtn.Content = "Remove One";
+            removeElementBtn.Click += RemoveElement_Click;
+            removeElementBtn.HorizontalAlignment = HorizontalAlignment.Right;
+            removeElementBtn.Margin = new Thickness(0, 10, 295, 0);
+
+            removeAllElementBtn.Width = 75;
+            removeAllElementBtn.Height = 25;
+            removeAllElementBtn.Content = "Remove All";
+            removeAllElementBtn.Click += RemoveAllElement_Click;
+            removeAllElementBtn.HorizontalAlignment = HorizontalAlignment.Right;
+            removeAllElementBtn.Margin = new Thickness(0, 10, 435, 0);
+
+            addSelectedElement.Width = 75;
+            addSelectedElement.Height = 25;
+            addSelectedElement.Content = "Add One";
+            addSelectedElement.Click += AddElement_Click;
+            addSelectedElement.HorizontalAlignment = HorizontalAlignment.Right;
+            addSelectedElement.Margin = new Thickness(0, 10, 575, 0);
+
+            addAllElementBtn.Width = 75;
+            addAllElementBtn.Height = 25;
+            addAllElementBtn.Content = "Add All";
+            addAllElementBtn.Click += AddAllElement_Click;
+            addAllElementBtn.HorizontalAlignment = HorizontalAlignment.Right;
+            addAllElementBtn.Margin = new Thickness(0, 10, 715, 0);
+            //removeElementBtn = new Button(), moveUpBtn = new Button(),
+            //moveDownBtn = new Button(), removeAllElementBtn = new Button(),
+            //addAllElementBtn = new Button(), addSelectedElement = new Button();
         }
+
+        private void AddAllElement_Click(object sender, RoutedEventArgs e)
+        {
+            // First clear all elements 
+            scrollViewerAfter.Items.Clear();
+            lastSelectedButtonSorted.Clear();
+            sortedElements.Clear();
+            // Tmp button and counting var
+            Button last;
+            int tmpId = 0;
+            // Then add all elements
+            foreach (Element el in elements)
+            {
+                last = new Button
+                {
+                    Content = "(" + el.GetElementType() + ") " + el.GetTitle(),
+                    Tag = tmpId,
+                    Width = scrollViewerBefore.Width - 20,
+                    Height = 25
+                };
+                sortedElements.Add(el);
+
+                last.Click += SetAfterSelection_Click;
+                lastSelectedButtonSorted.Add(last);
+                scrollViewerBefore.Items.Add(last);
+            }
+        }
+
+        private void SetAfterSelection_Click(object sender, RoutedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void AddElement_Click(object sender, RoutedEventArgs e)
+        {
+            Button last = new Button
+            {
+                Content = "(" + elements[lastSelectedButtonBefore].GetElementType() + ") " + elements[lastSelectedButtonBefore].GetTitle(),
+                Tag = lastSelectedButtonSorted.Count(),
+                Width = scrollViewerBefore.Width - 20,
+                Height = 25
+            };
+            sortedElements.Add(elements[lastSelectedButtonBefore]);
+            last.Click += SetAfterSelection_Click;
+            lastSelectedButtonSorted.Add(last);
+            scrollViewerBefore.Items.Add(last);
+        }
+
+        private void RemoveAllElement_Click(object sender, RoutedEventArgs e)
+        {
+            // First clear all elements 
+            scrollViewerAfter.Items.Clear();
+            lastSelectedButtonSorted.Clear();
+            sortedElements.Clear();
+        }
+
+        private void RemoveElement_Click(object sender, RoutedEventArgs e)
+        {
+            // First clear all elements 
+            if (lastSelectedButtonAfter != -1 && lastSelectedButtonAfter < sortedElements.Count())
+            {
+                scrollViewerAfter.Items.RemoveAt(lastSelectedButtonAfter);
+                lastSelectedButtonSorted.RemoveAt(lastSelectedButtonAfter);
+                sortedElements.RemoveAt(lastSelectedButtonAfter);
+                lastSelectedButtonAfter = -1;
+            }
+        }
+        private static List<Element> Swap(int indexA, int indexB)
+        {
+            List<Element> list = new List<Element>();
+            Element tmp = list[indexA];
+            list[indexA] = list[indexB];
+            list[indexB] = tmp;
+            return list;
+        }
+        private void MoveElementUp_Click(object sender, RoutedEventArgs e)
+        {
+            if(lastSelectedButtonAfter>0 && lastSelectedButtonAfter+1 < sortedElements.Count())
+            {
+                //scrollViewerAfter.Items.
+                sortedElements = Swap(lastSelectedButtonAfter, lastSelectedButtonAfter + 1);
+            }
+        }
+
+        private void MoveElementDown_Click(object sender, RoutedEventArgs e)
+        {
+            if (lastSelectedButtonAfter > 0 && lastSelectedButtonAfter < sortedElements.Count())
+            {
+                //scrollViewerAfter.Items.
+                sortedElements = Swap(lastSelectedButtonAfter, lastSelectedButtonAfter - 1);
+            }
+        }
+
         private void AddRowBtn_Click(object sender, RoutedEventArgs e)
         {
-            RowDefinition row = new RowDefinition();
-            row.Height = new GridLength(25, GridUnitType.Auto);
+            RowDefinition row = new RowDefinition
+            {
+                Height = new GridLength(25, GridUnitType.Auto)
+            };
             tableGrid.RowDefinitions.Add(row);
         }
         private void RemoveColumnBtn_Click(object sender, RoutedEventArgs e)
@@ -685,8 +1026,10 @@ namespace LayTexFileCreator
         }
         private void AddColumnBtn_Click(object sender, RoutedEventArgs e)
         {
-            ColumnDefinition column = new ColumnDefinition();
-            column.Width = new GridLength(25, GridUnitType.Auto);
+            ColumnDefinition column = new ColumnDefinition
+            {
+                Width = new GridLength(25, GridUnitType.Auto)
+            };
             tableGrid.ColumnDefinitions.Add(column);
         }
         private void InitlizeFigure(int id)
@@ -702,47 +1045,59 @@ namespace LayTexFileCreator
             // Reset Image, image button, Size selection radio buttons
             titleLabel.Content = "Figure subtext";
             titleLabel.Width = 100;
-            title = new TextBox();
-            title.Name = "title";
-            title.Text = "";
-            title.Width = sv.Width / 2;
-            title.Height = 20;
-            title.Background = Brushes.AntiqueWhite;
-            title.Foreground = Brushes.Navy;
-            title.HorizontalAlignment = HorizontalAlignment.Left;
+            title = new TextBox
+            {
+                Name = "title",
+                Text = "",
+                Width = sv.Width / 2,
+                Height = 20,
+                Background = Brushes.AntiqueWhite,
+                Foreground = Brushes.Navy,
+                HorizontalAlignment = HorizontalAlignment.Left
+            };
             title.TextChanged += UpdateTitle;
             title.SpellCheck.IsEnabled = true;
             title.TextWrapping = 0;
-            image = new Image();
-            image.Width = 225;
-            image.Height = 225;
-            image.Stretch = Stretch.Uniform;
-            image.HorizontalAlignment = HorizontalAlignment.Right;
-            image.VerticalAlignment = VerticalAlignment.Center;
-            smallImage = new RadioButton();
-            smallImage.Content = "Small";
-            smallImage.IsChecked = false;
-            smallImage.GroupName = "imageSize";
-            smallImage.Tag = 0;
+            image = new Image
+            {
+                Width = 225,
+                Height = 225,
+                Stretch = Stretch.Uniform,
+                HorizontalAlignment = HorizontalAlignment.Right,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            smallImage = new RadioButton
+            {
+                Content = "Small",
+                IsChecked = false,
+                GroupName = "imageSize",
+                Tag = 0
+            };
             smallImage.Click += UpdateImageSize;
             smallImage.HorizontalAlignment = HorizontalAlignment.Left;
-            mediumImage = new RadioButton();
-            mediumImage.Content = "Medium";
-            mediumImage.IsChecked = true;
-            mediumImage.GroupName = "imageSize";
-            mediumImage.Tag = 1;
+            mediumImage = new RadioButton
+            {
+                Content = "Medium",
+                IsChecked = true,
+                GroupName = "imageSize",
+                Tag = 1
+            };
             mediumImage.Click += UpdateImageSize;
             mediumImage.HorizontalAlignment = HorizontalAlignment.Center;
-            largeImage = new RadioButton();
-            largeImage.Content = "Large";
-            largeImage.IsChecked = false;
-            largeImage.GroupName = "imageSize";
-            largeImage.Tag = 2;
+            largeImage = new RadioButton
+            {
+                Content = "Large",
+                IsChecked = false,
+                GroupName = "imageSize",
+                Tag = 2
+            };
             largeImage.Click += UpdateImageSize;
             largeImage.HorizontalAlignment = HorizontalAlignment.Right;
-            uploadButton = new Button();
-            uploadButton.Width = 50;
-            uploadButton.Height = 50;
+            uploadButton = new Button
+            {
+                Width = 50,
+                Height = 50
+            };
             uploadButton.Click += OpenImageUploadDialog;
             uploadButton.Content = "Upload";
             //uploadButton.Background = Brushes.DarkCyan;
@@ -793,6 +1148,8 @@ namespace LayTexFileCreator
                         largeImage.IsChecked = false;
                         break;
                 }
+                Uri uri = new Uri(elements[selectedId].GetImageLocation());
+                image.Source = new BitmapImage(uri);
 
             }
         }
@@ -819,7 +1176,7 @@ namespace LayTexFileCreator
             RadioButton button = (RadioButton)sender;
             elements[selectedId].SetImageSize(int.Parse(button.Tag.ToString()));
         }
-        private void InitlizeTable(int id)                                              
+        private void InitlizeTable(int id)
         {
             //Steps
             // Clear other Controls
@@ -832,14 +1189,16 @@ namespace LayTexFileCreator
             // Reset Image, image button, Size selection radio buttons
             titleLabel.Content = "Table Title";
             titleLabel.Width = 100;
-            title = new TextBox();
-            title.Name = "title";
-            title.Text = "";
-            title.Width = sv.Width / 2;
-            title.Height = 20;
-            title.Background = Brushes.AntiqueWhite;
-            title.Foreground = Brushes.Navy;
-            title.HorizontalAlignment = HorizontalAlignment.Left;
+            title = new TextBox
+            {
+                Name = "title",
+                Text = "",
+                Width = sv.Width / 2,
+                Height = 20,
+                Background = Brushes.AntiqueWhite,
+                Foreground = Brushes.Navy,
+                HorizontalAlignment = HorizontalAlignment.Left
+            };
             title.TextChanged += UpdateTitle;
             title.SpellCheck.IsEnabled = true;
             title.TextWrapping = 0;
@@ -862,9 +1221,11 @@ namespace LayTexFileCreator
             {
                 for (int columns = 0; columns < totalColoums; columns++)
                 {
-                    tmpText = new TextBox();
-                    tmpText.Width = 50;
-                    tmpText.Text = tableStringData[rows][columns];
+                    tmpText = new TextBox
+                    {
+                        Width = 50,
+                        Text = tableStringData[rows][columns]
+                    };
                     Grid.SetColumn(tmpText, columns);
                     tmpGrid[columns].Children.Add(tmpText);
                 }
@@ -894,11 +1255,13 @@ namespace LayTexFileCreator
 
         }
         private Grid AddTableGrid(int totalColoums)
-        {   
-            Grid tGrid = new Grid();
-            tGrid.Width = totalColoums * 100;
-            tGrid.Height = 25;
-            tGrid.Background = Brushes.Pink;
+        {
+            Grid tGrid = new Grid
+            {
+                Width = totalColoums * 100,
+                Height = 25,
+                Background = Brushes.Pink
+            };
             ColumnDefinition column;
             tGrid.ColumnDefinitions.Clear();
 
@@ -915,6 +1278,9 @@ namespace LayTexFileCreator
         {
             try
             {
+                //selectedId = id;
+                //Steps
+
                 if (title.Text != "") {
                 // If id is -1 add an element to elements and change id to that new id
                 if (id < 0)
@@ -922,11 +1288,14 @@ namespace LayTexFileCreator
                     elements.Add(new Element());
                     id = elements.Count() - 1;
                 }
-                // Get title and reset title
+                    addBtn.Tag = type + "," + id;
+                    deleteBtn.Tag = type + "," + id;
+                    // Get title and reset title
 
-                elements[id].SetTitle(title.Text);
+                    elements[id].SetTitle(title.Text);
+
                 // Set type to element
-                elements[id].setElementType(type);
+                    elements[id].SetElementType(type);
                     // Get type specific data
                     if (type == "Table")
                     {
@@ -939,10 +1308,11 @@ namespace LayTexFileCreator
                                 tableStringData.Last().Add(textBox.Text);
                             }
                         }
+                        
                     }
                     else if (type == "Paragraph")
                     {
-                        elements[id].setBody(body.Text);
+                        elements[id].SetBody(body.Text);
                     }
                     else if (type == "List")
                     {
@@ -951,7 +1321,7 @@ namespace LayTexFileCreator
                         {
                             listItems.Add(text.Text);
                         }
-                        elements[id].setListItems(listItems);
+                        elements[id].SetListItems(listItems);
                     }
                     else if (type == "Figure")
                     {
@@ -967,7 +1337,10 @@ namespace LayTexFileCreator
                         {
                             elements[id].SetImageSize(2);
                         }
-                        elements[id].setImagLoc(selectedFile);
+                        if (selectedFile != "")
+                        {
+                            elements[id].SetImagLoc(selectedFile);
+                        }
 
                     }   
                 }

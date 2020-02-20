@@ -20,16 +20,13 @@
                     <MenuItem Header="_Update" Click="UpdateItem_Click" />
                     <MenuItem Header="_Push" Click="PushItem_Click"/>
                 </MenuItem>
-                <MenuItem Header="_LaTex" >
-                    <MenuItem Header="_Complie" Click="CompileItem_Click" />
-                    <MenuItem Header="_Open Reference" Click="OpenRefItem_Click"/>
-                </MenuItem>
-                <MenuItem Header="_Chapters" >
-                    <MenuItem Header="_Open Chapter Mode" Click="OpenChapterMode_Click" />
-                    <MenuItem Header="_Select Chapter Folder" Click="SelectChapterFolder_Click"/>
-                </MenuItem>
-                <MenuItem Header="_Pages" >
+                <MenuItem Header="_Modes" >
                     <MenuItem Header="_Open Page Mode" Click="OpenPageMode_Click" />
+                    <MenuItem Header="_Open Chapter Mode" Click="OpenChapterMode_Click" />
+                    <MenuItem Header="_Open Book Mode" Click="OpenBookMode_Click" />
+                </MenuItem>
+                <MenuItem Header="_Help" >
+                    <MenuItem Header="_Open Reference" Click="OpenRefItem_Click"/>
                 </MenuItem>
             </Menu>
             <GroupBox Header="Procedure Builder" Height="391" VerticalAlignment="Top" Width="778">

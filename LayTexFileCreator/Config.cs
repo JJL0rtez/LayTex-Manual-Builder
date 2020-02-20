@@ -10,11 +10,17 @@ namespace LayTexFileCreator
     public class Config
     {
         // Config Values
-       Brush BACKGROUND_COLOR = Brushes.AntiqueWhite;
-       Brush CONTROL_COLOR = Brushes.AntiqueWhite;
-       Brush GUI_COLOR = Brushes.FloralWhite;
-       
 
-        public Config() { }
+        public Brush BACKGROUND_COLOR { get; }
+        public Brush CONTROL_COLOR { get; }
+        public Brush GUI_COLOR { get; }
+        public Brush ACCENT_COLOR { get; }
+
+        public Config() {
+            BACKGROUND_COLOR = Brushes.AntiqueWhite;
+            CONTROL_COLOR = Brushes.AntiqueWhite;
+            GUI_COLOR = Brushes.FloralWhite;
+            ACCENT_COLOR = Brushes.LightGray;
+         }
     }
 }
