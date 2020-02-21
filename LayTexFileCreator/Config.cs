@@ -17,6 +17,7 @@ namespace LayTexFileCreator
         public Brush ACCENT_COLOR { get; set; }
 
         public string RAW_TEX_LOCATION { get; set; }
+        public string DEFAULT_DIRECTORY_LOCATION { get; set; }
         public string DEFAULT_PAGE_LOCATION { get; set; }
         public string RAW_CHAPTER_LOCATION { get; set; }
         public string COMPILED_MANUAL_LOCATION { get; set; }
@@ -40,10 +41,11 @@ namespace LayTexFileCreator
             GUI_COLOR = Brushes.FloralWhite;
             ACCENT_COLOR = Brushes.LightGray;
             // Storage locations
-            RAW_TEX_LOCATION = "C:/StonetownKarateManual/PreCompile/BookBackups";
-            DEFAULT_PAGE_LOCATION = "C:/StonetownKarateManual/PreCompile/PageBackups";
-            RAW_CHAPTER_LOCATION = "C:/StonetownKarateManual/PreCompile/ChapterBackups";
-            COMPILED_MANUAL_LOCATION = "C:/StonetownKarateManual/CompiledBookBackups";
+            DEFAULT_DIRECTORY_LOCATION = "C:/StonetownKarateManual";
+            RAW_TEX_LOCATION = DEFAULT_DIRECTORY_LOCATION + "/PreCompile/BookBackups";
+            DEFAULT_PAGE_LOCATION = DEFAULT_DIRECTORY_LOCATION + "/PreCompile/PageBackups";
+            RAW_CHAPTER_LOCATION = DEFAULT_DIRECTORY_LOCATION + "/PreCompile/ChapterBackups";
+            COMPILED_MANUAL_LOCATION = DEFAULT_DIRECTORY_LOCATION + "/CompiledBookBackups";
             // Book Cover Presets
             CREATED_BY = "STONETOWN KARATE CENTRE";
             BOOK_TITLE = new List<string>();

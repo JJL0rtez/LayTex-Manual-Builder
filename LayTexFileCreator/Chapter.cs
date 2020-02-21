@@ -11,8 +11,8 @@ namespace LayTexFileCreator
     [DataContract]
     public class Chapter
     {
-        private List<Page> Pages;
-        private string ChapterName;
+        public List<Page> Pages;
+        public string ChapterName;
 
         public Chapter(){ }
 
@@ -40,5 +40,19 @@ namespace LayTexFileCreator
             this.ChapterName = chapterName;
         }
 
+        internal void SetDateEdited(string v)
+        {
+            
+        }
+
+        internal void SetDateCreated(string v)
+        {
+            
+        }
+
+        internal string GetDateCreated()
+        {
+            return "Fill in latter";
+        }
     }
 }

@@ -10,6 +10,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Xml;
 using System.Xml.Serialization;
+using Microsoft.WindowsAPICodePack.Dialogs;
+
 
 namespace LayTexFileCreator
 {
@@ -19,9 +21,8 @@ namespace LayTexFileCreator
         Config config = new Config();
 
         List<Element> elements;
-        List<Page> pages;
-        List<Chapter> chapters;
-        Book book = new Book();
+        List<Page> pages = new List<Page>();
+        List<Chapter> chapters = new List<Chapter>();
 
         // ** NOTE ** lSBtn == lastSelectedButton 
 
@@ -40,7 +41,7 @@ namespace LayTexFileCreator
         Button removeChapterBtn = new Button(), moveUpBtnChapter = new Button(),
             moveDownBtnChapter = new Button(), removeAllChapterBtn = new Button(),
             addAllChapterBtn = new Button(), addSelectedChapter = new Button();
-        ListBox sVBeforeChapter, sVAfterChapter;
+        ListBox sVBeforeChapter = new ListBox(), sVAfterChapter = new ListBox();
         // Sorting elements vars
         List<Chapter> sortedChapters = new List<Chapter>();
         List<Button> lSBtnBook = new List<Button>(), lSBtnSortedBook = new List<Button>();
@@ -48,9 +49,11 @@ namespace LayTexFileCreator
         Button removeBookBtn = new Button(), moveUpBtnBook = new Button(),
             moveDownBtnBook = new Button(), removeAllBookBtn = new Button(),
             addAllBookBtn = new Button(), addSelectedBook = new Button();
-        ListBox sVBeforeBook, sVAfterBook;
+        ListBox sVBeforeBook= new ListBox(), sVAfterBook = new ListBox();
 
         Page page = new Page();
+        Book book = new Book();
+        Chapter chapter = new Chapter();
         Window popup = new Window();
         Grid popupGrid = new Grid();
 
@@ -143,7 +146,7 @@ namespace LayTexFileCreator
         private void CompileItem_Click(object sender, RoutedEventArgs e)
         {
             LaTex laTex = new LaTex();
-            book.SetChapters(chapters);
+            book.SetChapters(sortedChapters);
             laTex.CompileBook(book);
         }
         private void OpenRefItem_Click(object sender, RoutedEventArgs e)
@@ -346,19 +349,26 @@ namespace LayTexFileCreator
         }
         private void OpenItemSorted_Click(object sender, RoutedEventArgs e)
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            if (openFileDialog.ShowDialog() == true)
+            try
             {
-                System.Xml.Serialization.XmlSerializer reader = new System.Xml.Serialization.XmlSerializer(typeof(Page));
-                System.IO.StreamReader file = new System.IO.StreamReader(openFileDialog.FileName);
-                page = (Page)reader.Deserialize(file);
-                file.Close();
-                elements = page.GetElements();
-                UpdateElementList();
-                InitlizeParagraph("-1");
-                title.Text = "";
-                body.Text = "";
-                InitlizeBeforeListBox();
+                OpenFileDialog openFileDialog = new OpenFileDialog();
+                if (openFileDialog.ShowDialog() == true)
+                {
+                    System.Xml.Serialization.XmlSerializer reader = new System.Xml.Serialization.XmlSerializer(typeof(Page));
+                    System.IO.StreamReader file = new System.IO.StreamReader(openFileDialog.FileName);
+                    page = (Page)reader.Deserialize(file);
+                    file.Close();
+                    elements = page.GetElements();
+                    UpdateElementList();
+                    InitlizeParagraph("-1");
+                    title.Text = "";
+                    body.Text = "";
+                    InitlizeBeforeListBox();
+                }
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
             }
         }
         private void InitlizeBeforeListBox()
@@ -512,7 +522,7 @@ namespace LayTexFileCreator
             gridMain.HorizontalAlignment = HorizontalAlignment.Center;
 
             // Add selector controls
-            sVBefore = new ListBox
+            sVBeforeBook = new ListBox
             {
                 Height = groupBoxAfter.Height - 30,
                 Width = subWindowBook.Width / 2 - 60,
@@ -521,7 +531,7 @@ namespace LayTexFileCreator
                 Background = Brushes.AntiqueWhite,
                 Margin = new Thickness(1)
             };
-            sVAfter = new ListBox
+            sVAfterBook = new ListBox
             {
                 Height = groupBoxAfter.Height - 30,
                 Width = subWindowBook.Width / 2 - 60,
@@ -701,21 +711,176 @@ namespace LayTexFileCreator
             controlsGrid.Children.Add(addAllBookBtn);
 
             groupBoxControls.Content = controlsGrid;
-            groupBoxBefore.Content = sVBefore;
-            groupBoxAfter.Content = sVAfter;
+            groupBoxBefore.Content = sVBeforeBook;
+            groupBoxAfter.Content = sVAfterBook;
             subWindowBook.Content = gridMain;
         }
         private void OpenItemSortedBook_Click(object sender, RoutedEventArgs e)
         {
-            throw new NotImplementedException();
+            CommonOpenFileDialog dialog = new CommonOpenFileDialog();
+            dialog.InitialDirectory = config.DEFAULT_DIRECTORY_LOCATION = "\\PreCompile\\ChapterBackups";
+            dialog.IsFolderPicker = true;
+            chapters.Clear();
+            List<string> files = new List<string>();
+            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                files = Directory.GetFiles(dialog.FileName, "*.xml", SearchOption.AllDirectories).ToList();
+            }
+            foreach (string file in files)
+            {
+                System.Xml.Serialization.XmlSerializer reader = new System.Xml.Serialization.XmlSerializer(typeof(Chapter));
+                System.IO.StreamReader file1 = new System.IO.StreamReader(file);
+                chapters.Add((Chapter)reader.Deserialize(file1));
+
+                file1.Close();
+            }
+            // First clear all elements 
+            sVBeforeBook.Items.Clear();
+            lSBtnBook.Clear();
+
+            // Tmp btn and counting var
+            Button last;
+            int tmpId = 0;
+            // Then add all elements
+            foreach (Chapter chapter in chapters)
+            {
+                last = new Button
+                {
+                    Content = chapter.GetChapterName(),
+                    Tag = tmpId,
+                    Width = sVBeforeBook.Width - 20,
+                    Height = 25
+                };
+                //pages.Add(page);
+
+                last.Click += SetBeforeSelectionBook_Click;
+                lSBtnBook.Add(last);
+                sVBeforeBook.Items.Add(last);
+                tmpId++;
+            }
         }
-        private void SaveItemSortedBook_Click(object sender, RoutedEventArgs e)
+        private void SetBeforeSelectionBook_Click(object sender, RoutedEventArgs e)
         {
-            throw new NotImplementedException();
+            Button btn = (Button)sender;
+            foreach (Button b in lSBtnBook)
+            {
+                b.Background = Brushes.White;
+            }
+            lSBtnBook[int.Parse(btn.Tag.ToString())].Background = config.ACCENT_COLOR;
+            lSBtnBeforeBook = int.Parse(btn.Tag.ToString()); ;
+        }
+        private void SaveItemSortedChapter_Click(object sender, RoutedEventArgs e)
+        {
+            if (chapter.GetDateCreated() == null)
+            {
+                chapter.SetDateCreated(DateTime.Now.ToString("yyyy:MM:dd:h:mm:ss tt"));
+            }
+            chapter.SetDateEdited(DateTime.Now.ToString("yyyy:MM:dd:h:mm:ss tt"));
+            chapter.SetPages(sortedPages);
+            string name = "";
+            popup = new Window
+            {
+                Width = 300,
+                Height = 130,
+                Background = Brushes.LightGray
+            };
+
+            popupTitle.Content = "Chapter Title";
+            popupTitle.HorizontalAlignment = HorizontalAlignment.Center;
+            popupTitle.Margin = new Thickness(-20, 5, 0, 0);
+            popupTextbox.Text = "";
+            popupTextbox.Width = popup.Width - 35;
+            popupTextbox.HorizontalAlignment = HorizontalAlignment.Center;
+            popupTextbox.Margin = new Thickness(-20, 5, 0, 0);
+            saveButton.Width = 50;
+            saveButton.Height = 25;
+            saveButton.Content = "Save";
+            saveButton.HorizontalAlignment = HorizontalAlignment.Left;
+            saveButton.Margin = new Thickness(8, 5, 0, 0);
+            saveButton.Click += SaveChapter_Click;
+            cancelButton.Width = 50;
+            cancelButton.Height = 25;
+            cancelButton.Content = "Cancel";
+            cancelButton.HorizontalAlignment = HorizontalAlignment.Right;
+            cancelButton.Margin = new Thickness(0, 5, 27, 0);
+            cancelButton.Click += CancelPopup_Click;
+
+
+            popupGrid.Children.Clear();
+            popupGrid.Width = popup.Width;
+            popupGrid.Height = popup.Height;
+
+            RowDefinition row;
+            popupGrid.RowDefinitions.Clear();
+            row = new RowDefinition
+            {
+                Height = new GridLength(25, GridUnitType.Auto)
+            };
+            popupGrid.RowDefinitions.Add(row);
+            row = new RowDefinition
+            {
+                Height = new GridLength(25, GridUnitType.Auto)
+            };
+            popupGrid.RowDefinitions.Add(row);
+            row = new RowDefinition
+            {
+                Height = new GridLength(25, GridUnitType.Auto)
+            };
+            popupGrid.RowDefinitions.Add(row);
+
+            Grid.SetRow(popupTitle, 0);
+            popupGrid.Children.Add(popupTitle);
+            Grid.SetRow(popupTextbox, 1);
+            popupGrid.Children.Add(popupTextbox);
+            Grid.SetRow(saveButton, 2);
+            popupGrid.Children.Add(saveButton);
+            Grid.SetRow(cancelButton, 2);
+            popupGrid.Children.Add(cancelButton);
+
+            popup.Content = popupGrid;
+
+            popup.Show();
+            //page.Setname(name);
+        }
+        private void SaveChapter_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                
+                if (popupTextbox.Text != "")
+                {
+                    
+                    chapter.SetChapterName(popupTextbox.Text);
+                    chapter.SetPages(pages);
+                    SaveFileDialog saveFileDialog = new SaveFileDialog
+                    {
+                        Filter = "Xml file|*.xml",
+                        Title = "Save a page data File",
+                        FileName = popupTextbox.Text + "_sorted.xml"
+                    };
+
+                    saveFileDialog.ShowDialog();
+                    XmlDocument xmlDocument = new XmlDocument();
+                    XmlSerializer serializer = new XmlSerializer(typeof(Chapter));
+                    using (MemoryStream stream = new MemoryStream())
+                    {
+                        serializer.Serialize(stream, chapter);
+                        stream.Position = 0;
+                        xmlDocument.Load(stream);
+                        xmlDocument.Save(saveFileDialog.FileName);
+                    }
+                    popup.Close();
+
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
         }
         private void MoveUpBook_Click(object sender, RoutedEventArgs e)
         {
-            if (lSBtnAfterBook >= 0 && lSBtnAfterBook < sortedChapters.Count())
+            if (lSBtnAfterBook >= 0 && lSBtnAfterBook > 0)
             {
                 sVAfterBook.Items.Clear();
                 lSBtnSortedBook.Clear();
@@ -736,6 +901,7 @@ namespace LayTexFileCreator
                     sVAfterBook.Items.Add(last);
                     tmpId++;
                 }
+                lSBtnAfterBook = -1;
             }
         }
         private List<Page> SwapChapter(int a, int b)
@@ -758,7 +924,7 @@ namespace LayTexFileCreator
             {
                 sVAfterBook.Items.Clear();
                 lSBtnSortedBook.Clear();
-                sortedChapters = SwapBook(lSBtnAfterBook, lSBtnAfterBook - 1);
+                sortedChapters = SwapBook(lSBtnAfterBook, lSBtnAfterBook + 1);
                 Button last;
                 int tmpId = 0;
                 foreach (Chapter chapter in sortedChapters)
@@ -775,6 +941,7 @@ namespace LayTexFileCreator
                     sVAfterBook.Items.Add(last);
                     tmpId++;
                 }
+                lSBtnAfterBook = -1;
             }
         }
         private void RemoveBook_Click(object sender, RoutedEventArgs e)
@@ -839,14 +1006,14 @@ namespace LayTexFileCreator
                 {
                     Content = chapter.GetChapterName(),
                     Tag = tmpId,
-                    Width = sVBefore.Width - 20,
+                    Width = sVBeforeBook.Width - 20,
                     Height = 25
                 };
                 sortedChapters.Add(chapter);
 
                 last.Click += SetAfterSelectionBook_Click;
                 lSBtnSortedBook.Add(last);
-                sVAfter.Items.Add(last);
+                sVAfterBook.Items.Add(last);
                 tmpId++;
             }
         }
@@ -915,7 +1082,7 @@ namespace LayTexFileCreator
             gridMain.HorizontalAlignment = HorizontalAlignment.Center;
 
             // Add selector controls
-            sVBefore = new ListBox
+            sVBeforeChapter = new ListBox
             {
                 Height = groupBoxAfter.Height - 30,
                 Width = subWindowChapter.Width / 2 - 60,
@@ -924,7 +1091,7 @@ namespace LayTexFileCreator
                 Background = Brushes.AntiqueWhite,
                 Margin = new Thickness(1)
             };
-            sVAfter = new ListBox
+            sVAfterChapter = new ListBox
             {
                 Height = groupBoxAfter.Height - 30,
                 Width = subWindowChapter.Width / 2 - 60,
@@ -1082,8 +1249,8 @@ namespace LayTexFileCreator
 
             Grid.SetColumn(moveUpBtnChapter, 0);
             controlsGrid.Children.Add(moveUpBtnChapter);
-            Grid.SetColumn(moveDownBtn, 1);
-            controlsGrid.Children.Add(moveDownBtn);
+            Grid.SetColumn(moveDownBtnChapter, 1);
+            controlsGrid.Children.Add(moveDownBtnChapter);
             Grid.SetColumn(removeChapterBtn, 2);
             controlsGrid.Children.Add(removeChapterBtn);
             Grid.SetColumn(removeAllChapterBtn, 3);
@@ -1094,24 +1261,24 @@ namespace LayTexFileCreator
             controlsGrid.Children.Add(addAllChapterBtn);
 
             groupBoxControls.Content = controlsGrid;
-            groupBoxBefore.Content = sVBefore;
-            groupBoxAfter.Content = sVAfter;
+            groupBoxBefore.Content = sVBeforeChapter;
+            groupBoxAfter.Content = sVAfterChapter;
             subWindowChapter.Content = gridMain;
         }
         private void MoveUpChapter_Click(object sender, RoutedEventArgs e)
         {
-            if (lSBtnAfterChapter >= 0 && lSBtnAfterChapter < sortedChapters.Count())
+            if (lSBtnAfterChapter >= 0 && lSBtnAfterChapter > 0)
             {
                 sVAfterChapter.Items.Clear();
                 lSBtnSortedChapter.Clear();
                 sortedPages = SwapChapter(lSBtnAfterChapter, lSBtnAfterChapter - 1);
                 Button last;
                 int tmpId = 0;
-                foreach (Chapter chapter in sortedChapters)
+                foreach (Page page in sortedPages)
                 {
                     last = new Button
                     {
-                        Content = chapter.GetChapterName(),
+                        Content = page.Getname(),
                         Tag = tmpId,
                         Width = sVBeforeChapter.Width - 20,
                         Height = 25
@@ -1125,18 +1292,18 @@ namespace LayTexFileCreator
         }
         private void MoveDownChapter_Click(object sender, RoutedEventArgs e)
         {
-          if (lSBtnAfterChapter >= 0 && lSBtnAfterChapter + 1 < sortedChapters.Count())
+          if (lSBtnAfterChapter >= 0 && lSBtnAfterChapter + 1 < sortedPages.Count())
             {
                 sVAfterChapter.Items.Clear();
                 lSBtnSortedChapter.Clear();
-                sortedPages = SwapChapter(lSBtnAfterChapter, lSBtnAfterChapter - 1);
+                sortedPages = SwapChapter(lSBtnAfterChapter, lSBtnAfterChapter +  1);
                 Button last;
                 int tmpId = 0;
-                foreach (Chapter chapter in sortedChapters)
+                foreach (Page page in sortedPages)
                 {
                     last = new Button
                     {
-                        Content = chapter.GetChapterName(),
+                        Content = page.Getname(),
                         Tag = tmpId,
                         Width = sVBeforeChapter.Width - 20,
                         Height = 25
@@ -1178,14 +1345,28 @@ namespace LayTexFileCreator
         }
         private void AddChapter_Click(object sender, RoutedEventArgs e)
         {
-            throw new NotImplementedException();
+            if (lSBtnBeforeChapter != -1)
+            {
+                Button last = new Button
+                {
+                    Content = pages[lSBtnBeforeChapter].Getname(),
+                    Tag = lSBtnSortedBook.Count(),
+                    Width = sVBeforeChapter.Width - 20,
+                    Height = 25
+                };
+                sortedPages.Add(pages[lSBtnBeforeChapter]);
+                last.Click += SetAfterSelectionBook_Click;
+                lSBtnSortedChapter.Add(last);
+                sVAfterChapter.Items.Add(last);
+                lSBtnBeforeChapter = -1;
+            }
         }
         private void AddAllChapter_Click(object sender, RoutedEventArgs e)
         {
             // First clear all elements 
             sVAfterChapter.Items.Clear();
             lSBtnSortedChapter.Clear();
-            sortedChapters.Clear();
+            sortedPages.Clear();
             // Tmp btn and counting var
             Button last;
             int tmpId = 0;
@@ -1196,28 +1377,112 @@ namespace LayTexFileCreator
                 {
                     Content = page.Getname(),
                     Tag = tmpId,
-                    Width = sVBefore.Width - 20,
+                    Width = sVBeforeChapter.Width - 20,
                     Height = 25
                 };
                 sortedPages.Add(page);
 
                 last.Click += SetAfterSelectionChapter_Click;
                 lSBtnSortedChapter.Add(last);
-                sVAfter.Items.Add(last);
+                sVAfterChapter.Items.Add(last);
                 tmpId++;
             }
         }
         private void SetAfterSelectionChapter_Click(object sender, RoutedEventArgs e)
         {
-            throw new NotImplementedException();
+            Button btn = (Button)sender;
+            foreach (Button b in lSBtnSortedChapter)
+            {
+                b.Background = Brushes.White;
+            }
+            lSBtnSortedChapter[int.Parse(btn.Tag.ToString())].Background = config.ACCENT_COLOR;
+            lSBtnAfterChapter = int.Parse(btn.Tag.ToString());
         }
-        private void SaveItemSortedChapter_Click(object sender, RoutedEventArgs e)
+        private void SaveItemSortedBook_Click(object sender, RoutedEventArgs e)
         {
-            throw new NotImplementedException();
+            //if (chapter.GetDateCreated() == null)
+            //{
+            //    chapter.SetDateCreated(DateTime.Now.ToString("yyyy:MM:dd:h:mm:ss tt"));
+            //}
+            //chapter.SetDateEdited(DateTime.Now.ToString("yyyy:MM:dd:h:mm:ss tt"));
+            //chapter.SetPages(sortedPages);
+            book.SetChapters(chapters);
+
+            SaveFileDialog saveFileDialog = new SaveFileDialog
+            {
+                InitialDirectory = config.DEFAULT_DIRECTORY_LOCATION + config.DEFAULT_DIRECTORY_LOCATION,
+                Filter = "Xml file|*.xml",
+                Title = "Save a page data File",
+                FileName = DateTime.Now.ToString("yyyy_MM_dd_h_mm_ss_tt") + "_backup.xml"
+            };
+
+            saveFileDialog.ShowDialog();
+            XmlDocument xmlDocument = new XmlDocument();
+            XmlSerializer serializer = new XmlSerializer(typeof(Page));
+            using (MemoryStream stream = new MemoryStream())
+            {
+                serializer.Serialize(stream, page);
+                stream.Position = 0;
+                xmlDocument.Load(stream);
+                xmlDocument.Save(saveFileDialog.FileName);
+            }
         }
+
+
+
         private void OpenItemSortedChapter_Click(object sender, RoutedEventArgs e)
         {
-            throw new NotImplementedException();
+            CommonOpenFileDialog dialog = new CommonOpenFileDialog();
+            dialog.InitialDirectory = config.DEFAULT_DIRECTORY_LOCATION ;
+            dialog.IsFolderPicker = true;
+            List<string> files = new List<string>();
+            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                files = Directory.GetFiles(dialog.FileName, "*.xml" ,SearchOption.AllDirectories).ToList();
+            }
+            foreach(string file in files)
+            {
+                System.Xml.Serialization.XmlSerializer reader = new System.Xml.Serialization.XmlSerializer(typeof(Page));
+                System.IO.StreamReader file1 = new System.IO.StreamReader(file);
+                pages.Add((Page)reader.Deserialize(file1));
+                
+                file1.Close();
+            }
+            // First clear all elements 
+            sVBeforeChapter.Items.Clear();
+            lSBtnChapter.Clear();
+            
+            // Tmp btn and counting var
+            Button last;
+            int tmpId = 0;
+            // Then add all elements
+            foreach (Page page in pages)
+            {
+                last = new Button
+                {
+                    Content = page.Getname(),
+                    Tag = tmpId,
+                    Width = sVBeforeChapter.Width - 20,
+                    Height = 25
+                };
+                //pages.Add(page);
+
+                last.Click += SetBeforeSelectionChapter_Click;
+                lSBtnChapter.Add(last);
+                sVBeforeChapter.Items.Add(last);
+                tmpId++;
+            }
+
+        }
+        private void SetBeforeSelectionChapter_Click(object sender, RoutedEventArgs e)
+        {
+            Button btn = (Button)sender;
+            foreach (Button b in lSBtnChapter)
+            {
+                b.Background = Brushes.White;
+            }
+            lSBtnChapter[int.Parse(btn.Tag.ToString())].Background = config.ACCENT_COLOR;
+            lSBtnBeforeChapter = int.Parse(btn.Tag.ToString());
         }
         private void OpenPageMode_Click(object sender, RoutedEventArgs e)
         {
@@ -1278,7 +1543,7 @@ namespace LayTexFileCreator
             gridMain.HorizontalAlignment = HorizontalAlignment.Center;
             //grid.Margin = new Thickness(5);
             // Add selector controls
-            sVBefore = new ListBox
+            sVBeforeChapter = new ListBox
             {
                 Height = groupBoxAfter.Height - 30,
                 Width = subWindow.Width / 2 - 60,
@@ -1287,7 +1552,7 @@ namespace LayTexFileCreator
                 Background = Brushes.AntiqueWhite,
                 Margin = new Thickness(1)
             };
-            sVAfter = new ListBox
+            sVAfterChapter = new ListBox
             {
                 Height = groupBoxAfter.Height - 30,
                 Width = subWindow.Width / 2 - 60,

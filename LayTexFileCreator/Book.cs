@@ -10,7 +10,7 @@ namespace LayTexFileCreator
     [DataContract]
     public class Book
     {
-        private List<Chapter> Chapters;
+        public List<Chapter> Chapters;
 
         public Book() { }
 

@@ -12,3 +12,8 @@ C:\Users\jjlor\source\repos\LayTexFileCreator\LayTexFileCreator\obj\Debug\LayTex
 C:\Users\jjlor\source\repos\LayTexFileCreator\LayTexFileCreator\obj\Debug\LayTexFileCreator.csproj.GenerateResource.cache
 C:\Users\jjlor\source\repos\LayTexFileCreator\LayTexFileCreator\obj\Debug\LayTexFileCreator.exe
 C:\Users\jjlor\source\repos\LayTexFileCreator\LayTexFileCreator\obj\Debug\LayTexFileCreator.pdb
+C:\Users\jjlor\source\repos\LayTexFileCreator\LayTexFileCreator\bin\Debug\Microsoft.WindowsAPICodePack.dll
+C:\Users\jjlor\source\repos\LayTexFileCreator\LayTexFileCreator\bin\Debug\Microsoft.WindowsAPICodePack.Shell.dll
+C:\Users\jjlor\source\repos\LayTexFileCreator\LayTexFileCreator\bin\Debug\Microsoft.WindowsAPICodePack.xml
+C:\Users\jjlor\source\repos\LayTexFileCreator\LayTexFileCreator\bin\Debug\Microsoft.WindowsAPICodePack.Shell.xml
+C:\Users\jjlor\source\repos\LayTexFileCreator\LayTexFileCreator\obj\Debug\LayTexFileCreator.csproj.CopyComplete

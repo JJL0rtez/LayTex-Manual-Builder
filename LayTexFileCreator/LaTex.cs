@@ -14,7 +14,9 @@ namespace LayTexFileCreator
 		private List<string> doParagraph(bool isSection, Element element)
 		{
 			List<string> data = new List<string>();
-			data.Add("");
+			try
+			{
+				data.Add("");
 			if (isSection)
 			{
 				data.Add("\\section{" + element.GetTitle() + "}");
@@ -26,12 +28,20 @@ namespace LayTexFileCreator
 			}
 			data.Add(element.GetBody());
 			data.Add("");
+			} 
+			catch (Exception ex)
+			{
+				data = new List<string>();
+				Console.WriteLine(ex.Message);
+			}
 			return data;
 		}
 		private List<string> doList(bool isSection, Element element)
 		{
 			List<string> data = new List<string>();
-			data.Add("");
+			try
+			{
+				data.Add("");
 			if (isSection)
 			{
 				data.Add("\\section{" + element.GetTitle() + "}");
@@ -41,37 +51,57 @@ namespace LayTexFileCreator
 			{
 				data.Add("\\subsection{" + element.GetTitle() + "}");
 			}
-			data.Add("\\begin{ enumerate}");
+			data.Add("\\begin{enumerate}");
 			foreach (string listItem in element.GetListItems())
 			{
 				data.Add("  \\item " + listItem);
 			}
-			data.Add("\\end{ enumerate}");
+			data.Add("\\end{enumerate}");
 			data.Add("");
+		    } 
+			catch (Exception ex)
+			{
+				data = new List<string>();
+				Console.WriteLine(ex.Message);
+			}
 			return data;
 		}
 		private List<string> doFigure(bool isSection, Element element)
 		{
 			List<string> data = new List<string>();
-			File.Copy(element.GetImageLocation(), config.IMAGE_GRAPHICS_PATH);
-			
-			data.Add("\\begin{ figure}[!htb]");
-			data.Add("\\centering");
-			if (element.GetImageSize() == 0)
+			try
 			{
-				data.Add("\\includegraphics[width = 4cm, height = 3.44cm]{" + element.GetImageLocation().Substring(element.GetImageLocation().LastIndexOf(" / ", element.GetImageLocation().Last())) + " } ");
+				File.Copy(element.GetImageLocation(), config.IMAGE_GRAPHICS_PATH);
 			}
-			else if (element.GetImageSize() == 2)
+			catch(IOException ioEx)
 			{
-				data.Add("\\includegraphics[width = 8cm, height = 6.88cm]{" + element.GetImageLocation().Substring(element.GetImageLocation().LastIndexOf(" / ", element.GetImageLocation().Last()))+ " } ");
+				Console.WriteLine(ioEx.Message);
 			}
-			else
+			try
 			{
-				data.Add("\\includegraphics[width = 6cm, height = 4.66cm]{" + element.GetImageLocation().Substring(element.GetImageLocation().LastIndexOf(" / ", element.GetImageLocation().Last())) + " } ");
+				data.Add("\\begin{figure}[!htb]");
+				data.Add("\\centering");
+				if (element.GetImageSize() == 0)
+				{
+					data.Add("\\includegraphics[width = 4cm, height = 3.44cm]{" + element.GetImageLocation().Substring(element.GetImageLocation().LastIndexOf(" / ", element.GetImageLocation().Last())) + " } ");
+				}
+				else if (element.GetImageSize() == 2)
+				{
+					data.Add("\\includegraphics[width = 8cm, height = 6.88cm]{" + element.GetImageLocation().Substring(element.GetImageLocation().LastIndexOf(" / ", element.GetImageLocation().Last())) + " } ");
+				}
+				else
+				{
+					data.Add("\\includegraphics[width = 6cm, height = 4.66cm]{" + element.GetImageLocation().Substring(element.GetImageLocation().LastIndexOf(" / ", element.GetImageLocation().Last())) + " } ");
 
+				}
+				data.Add("\\caption{" + element.GetTitle() + "}");
+				data.Add("\\end{figure}");
 			}
-			data.Add("\\caption{" + element.GetTitle() + "}");
-			data.Add("\\end{figure}");
+			catch(Exception ex)
+			{
+				data = new List<string>();
+				Console.WriteLine(ex.Message);
+			}
 			return data;
 		}
 		private List<List<String>> CompileChapter(Book book)
@@ -91,15 +121,15 @@ namespace LayTexFileCreator
 						{
 							if (element.GetElementType() == "Paragraph")
 							{
-								doParagraph(isSection, element);
+								data[tmp].AddRange(doParagraph(isSection, element));
 							}
 							else if (element.GetElementType() == "List")
 							{
-								doList(isSection, element);
+								data[tmp].AddRange(doList(isSection, element));
 							}
 							else if (element.GetElementType() == "Figure")
 							{
-								doFigure(isSection, element);
+								data[tmp].AddRange(doFigure(isSection, element));
 							}
 						}
 					}
@@ -235,7 +265,7 @@ namespace LayTexFileCreator
 				}
 				file.WriteLine("\\end{document}");
 				file.Close();
-
+				
 			}
         }
 
