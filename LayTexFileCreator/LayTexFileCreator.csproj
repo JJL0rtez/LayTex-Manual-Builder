@@ -68,7 +68,8 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="ChapterWindow.cs" />
+    <Compile Include="Book.cs" />
+    <Compile Include="Chapter.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="LaTex.cs" />
     <Compile Include="Page.cs" />
