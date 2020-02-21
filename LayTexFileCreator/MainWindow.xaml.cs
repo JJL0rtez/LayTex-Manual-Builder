@@ -19,14 +19,36 @@ namespace LayTexFileCreator
         Config config = new Config();
 
         List<Element> elements;
+        List<Page> pages;
+        List<Chapter> chapters;
+        Book book = new Book();
+
+        // ** NOTE ** lSBtn == lastSelectedButton 
 
         // Sorting elements vars
         List<Element> sortedElements = new List<Element>();
-        List<Button> lastSelectedButton = new List<Button>(), lastSelectedButtonSorted = new List<Button>();
-        int lastSelectedButtonBefore = 0, lastSelectedButtonAfter = 0;
+        List<Button> lSBtn = new List<Button>(), lSBtnSorted = new List<Button>();
+        int lSBtnBefore = 0, lSBtnAfter = 0;
         Button removeElementBtn = new Button(), moveUpBtn = new Button(),
             moveDownBtn = new Button(), removeAllElementBtn = new Button(),
             addAllElementBtn = new Button(), addSelectedElement = new Button();
+        ListBox sVBefore, sVAfter;
+        // Sorting elements vars
+        List<Page> sortedPages = new List<Page>();
+        List<Button> lSBtnChapter = new List<Button>(), lSBtnSortedChapter = new List<Button>();
+        int lSBtnBeforeChapter = 0, lSBtnAfterChapter = 0;
+        Button removeChapterBtn = new Button(), moveUpBtnChapter = new Button(),
+            moveDownBtnChapter = new Button(), removeAllChapterBtn = new Button(),
+            addAllChapterBtn = new Button(), addSelectedChapter = new Button();
+        ListBox sVBeforeChapter, sVAfterChapter;
+        // Sorting elements vars
+        List<Chapter> sortedChapters = new List<Chapter>();
+        List<Button> lSBtnBook = new List<Button>(), lSBtnSortedBook = new List<Button>();
+        int lSBtnBeforeBook = 0, lSBtnAfterBook = 0;
+        Button removeBookBtn = new Button(), moveUpBtnBook = new Button(),
+            moveDownBtnBook = new Button(), removeAllBookBtn = new Button(),
+            addAllBookBtn = new Button(), addSelectedBook = new Button();
+        ListBox sVBeforeBook, sVAfterBook;
 
         Page page = new Page();
         Window popup = new Window();
@@ -65,7 +87,7 @@ namespace LayTexFileCreator
         TextBox popupTextbox = new TextBox();
 
         //
-        ListBox scrollViewerBefore, scrollViewerAfter;
+        
 
         public MainWindow()
         {
@@ -101,8 +123,8 @@ namespace LayTexFileCreator
         }
         private void AddClick(object sender, RoutedEventArgs e)
         {
-            Button button = (Button)sender;
-            string[] strlist = button.Tag.ToString().Split(',');
+            Button btn = (Button)sender;
+            string[] strlist = btn.Tag.ToString().Split(',');
             SaveData(strlist[0], int.Parse(strlist[1]));
             UpdateElementList();
             addBtn.Content = "Update Element";
@@ -120,6 +142,9 @@ namespace LayTexFileCreator
         }
         private void CompileItem_Click(object sender, RoutedEventArgs e)
         {
+            LaTex laTex = new LaTex();
+            book.SetChapters(chapters);
+            laTex.CompileBook(book);
         }
         private void OpenRefItem_Click(object sender, RoutedEventArgs e)
         {
@@ -139,15 +164,15 @@ namespace LayTexFileCreator
         }
         private void AddFigure_Click(object sender, RoutedEventArgs e)
         {
-            //Button button = (Button)sender;
+            //Button btn = (Button)sender;
             //elements.Add(new Element());
             addBtn.Content = "Add Element";
             InitlizeFigure(-1);
         }
         private void DeleteClick(object sender, RoutedEventArgs e)
         {
-            Button button = (Button)sender;
-            string[] strlist = button.Tag.ToString().Split(',');
+            Button btn = (Button)sender;
+            string[] strlist = btn.Tag.ToString().Split(',');
             if (int.Parse(strlist[1]) >= 0 && int.Parse(strlist[1]) < elements.Count())
             {
                 elements.RemoveAt(int.Parse(strlist[1]));
@@ -340,7 +365,7 @@ namespace LayTexFileCreator
         {
             Button last;
             int tmpId = 0;
-            lastSelectedButton = new List<Button>();
+            lSBtn = new List<Button>();
             foreach (Element el in elements)
             {
 
@@ -348,24 +373,24 @@ namespace LayTexFileCreator
                 {
                     Content = "(" + el.GetElementType() + ") " + el.GetTitle(),
                     Tag = tmpId,
-                    Width = scrollViewerBefore.Width - 20,
+                    Width = sVBefore.Width - 20,
                     Height = 25
                 };
                 last.Click += SetBeforeSelection_Click;
-                lastSelectedButton.Add(last);
-                scrollViewerBefore.Items.Add(last);
+                lSBtn.Add(last);
+                sVBefore.Items.Add(last);
                 tmpId++;
             }
         }
         private void SetBeforeSelection_Click(object sender, RoutedEventArgs e)
         {
-            Button button = (Button)sender;
-            foreach (Button b in lastSelectedButton)
+            Button btn = (Button)sender;
+            foreach (Button b in lSBtn)
             {
                 b.Background = Brushes.White;
             }
-            lastSelectedButton[int.Parse(button.Tag.ToString())].Background = config.ACCENT_COLOR;
-            lastSelectedButtonBefore = int.Parse(button.Tag.ToString());
+            lSBtn[int.Parse(btn.Tag.ToString())].Background = config.ACCENT_COLOR;
+            lSBtnBefore = int.Parse(btn.Tag.ToString());
         }
         private void CancelPopup_Click(object sender, RoutedEventArgs e)
         {
@@ -434,11 +459,765 @@ namespace LayTexFileCreator
         }
         private void OpenBookMode_Click(object sender, RoutedEventArgs e)
         {
+            // First open new page
+            Window subWindowBook = new Window();
+            subWindowBook.Show();
+            subWindowBook.Height = 500;
+            subWindowBook.Width = 800;
+            subWindowBook.Title = "Book_Mode";
+            // Draw GroupBox and Grid
+            Grid grid = new Grid(), gridMain = new Grid(), controlsGrid = new Grid();
+            GroupBox groupBoxMain = new GroupBox();
+            groupBoxMain.Width = subWindowBook.Width - 40;
+            groupBoxMain.Height = subWindowBook.Height - 70;
+            groupBoxMain.VerticalAlignment = VerticalAlignment.Center;
+            groupBoxMain.HorizontalAlignment = HorizontalAlignment.Center;
+            groupBoxMain.Header = "Book Order Selector";
+            groupBoxMain.Margin = new Thickness(5);
+            GroupBox groupBoxBefore = new GroupBox();
+            groupBoxBefore.Width = subWindowBook.Width / 2 - 40;
+            groupBoxBefore.Height = subWindowBook.Height - 160;
+            groupBoxBefore.VerticalAlignment = VerticalAlignment.Center;
+            groupBoxBefore.HorizontalAlignment = HorizontalAlignment.Left;
+            groupBoxBefore.Header = "Non-Sorted View";
+            groupBoxBefore.Margin = new Thickness(5);
+            GroupBox groupBoxAfter = new GroupBox();
+            groupBoxAfter.Width = subWindowBook.Width / 2 - 40;
+            groupBoxAfter.Height = subWindowBook.Height - 160;
+            groupBoxAfter.VerticalAlignment = VerticalAlignment.Center;
+            groupBoxAfter.HorizontalAlignment = HorizontalAlignment.Right;
+            groupBoxAfter.Header = "Sorted View";
+            groupBoxAfter.Margin = new Thickness(5);
+            GroupBox groupBoxControls = new GroupBox();
+            groupBoxControls.Width = subWindowBook.Width - 60;
+            groupBoxControls.Height = 55;
+            groupBoxControls.VerticalAlignment = VerticalAlignment.Center;
+            groupBoxControls.HorizontalAlignment = HorizontalAlignment.Center;
+            groupBoxControls.Header = "Order Controls";
+            groupBoxControls.Margin = new Thickness(5, 5, 5, 0);
 
+            grid.Width = groupBoxMain.Width - 10;
+            grid.Height = groupBoxMain.Height - 10;
+            grid.VerticalAlignment = VerticalAlignment.Center;
+            grid.HorizontalAlignment = HorizontalAlignment.Center;
+
+            controlsGrid.Width = groupBoxControls.Width - 10;
+            controlsGrid.Height = groupBoxControls.Height - 10;
+            controlsGrid.VerticalAlignment = VerticalAlignment.Center;
+            controlsGrid.HorizontalAlignment = HorizontalAlignment.Center;
+
+            gridMain.Width = subWindowBook.Width;
+            gridMain.Height = subWindowBook.Height;
+            gridMain.VerticalAlignment = VerticalAlignment.Center;
+            gridMain.HorizontalAlignment = HorizontalAlignment.Center;
+
+            // Add selector controls
+            sVBefore = new ListBox
+            {
+                Height = groupBoxAfter.Height - 30,
+                Width = subWindowBook.Width / 2 - 60,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+                Background = Brushes.AntiqueWhite,
+                Margin = new Thickness(1)
+            };
+            sVAfter = new ListBox
+            {
+                Height = groupBoxAfter.Height - 30,
+                Width = subWindowBook.Width / 2 - 60,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+                Background = Brushes.AntiqueWhite,
+                Margin = new Thickness(1)
+            };
+
+            Menu menu = new Menu
+            {
+                Margin = new Thickness(5, 20, 0, 0)
+            };
+            MenuItem file = new MenuItem
+            {
+                Header = " File"
+            };
+            MenuItem saveMenuItem = new MenuItem
+            {
+                Header = " Save"
+            };
+            saveMenuItem.Click += SaveItemSortedBook_Click;
+            MenuItem loadMenuItem = new MenuItem
+            {
+                Header = " Load"
+            };
+            loadMenuItem.Click += OpenItemSortedBook_Click;
+            MenuItem compile = new MenuItem
+            {
+                Header = " Compile"
+            };
+            MenuItem compileFile = new MenuItem
+            {
+                Header = " Compile to Book"
+            };
+            compileFile.Click += CompileItem_Click;
+
+            //menu.Background = Brushes.Red;
+            menu.Items.Insert(0, file);
+            menu.Items.Insert(1, compile);
+            file.Items.Insert(0, saveMenuItem);
+            file.Items.Insert(1, loadMenuItem);
+            compile.Items.Insert(0, compileFile);
+
+            RowDefinition row;
+            gridMain.RowDefinitions.Clear();
+            row = new RowDefinition
+            {
+                Height = new GridLength(25, GridUnitType.Auto)
+            };
+            gridMain.RowDefinitions.Add(row);
+            row = new RowDefinition
+            {
+                Height = new GridLength(25, GridUnitType.Auto)
+            };
+            gridMain.RowDefinitions.Add(row);
+
+            Grid.SetRow(menu, 0);
+            gridMain.Children.Add(menu);
+            Grid.SetRow(groupBoxMain, 1);
+            gridMain.Children.Add(groupBoxMain);
+
+            groupBoxMain.Content = grid;
+
+            row = new RowDefinition
+            {
+                Height = new GridLength(25, GridUnitType.Auto)
+            };
+            grid.RowDefinitions.Add(row);
+            row = new RowDefinition
+            {
+                Height = new GridLength(25, GridUnitType.Auto)
+            };
+            grid.RowDefinitions.Add(row);
+
+
+            Grid.SetRow(groupBoxControls, 0);
+            grid.Children.Add(groupBoxControls);
+            Grid.SetRow(groupBoxBefore, 1);
+            grid.Children.Add(groupBoxBefore);
+            Grid.SetRow(groupBoxAfter, 1);
+            grid.Children.Add(groupBoxAfter);
+
+            ColumnDefinition column;
+            column = new ColumnDefinition
+            {
+                Width = new GridLength(25, GridUnitType.Auto)
+            };
+            controlsGrid.ColumnDefinitions.Add(column);
+            column = new ColumnDefinition
+            {
+                Width = new GridLength(25, GridUnitType.Auto)
+            };
+            controlsGrid.ColumnDefinitions.Add(column);
+            column = new ColumnDefinition
+            {
+                Width = new GridLength(25, GridUnitType.Auto)
+            };
+            controlsGrid.ColumnDefinitions.Add(column);
+            column = new ColumnDefinition
+            {
+                Width = new GridLength(25, GridUnitType.Auto)
+            };
+            controlsGrid.ColumnDefinitions.Add(column);
+            column = new ColumnDefinition
+            {
+                Width = new GridLength(25, GridUnitType.Auto)
+            };
+            controlsGrid.ColumnDefinitions.Add(column);
+            column = new ColumnDefinition
+            {
+                Width = new GridLength(25, GridUnitType.Auto)
+            };
+            controlsGrid.ColumnDefinitions.Add(column);
+
+            moveUpBtnBook = new Button();
+            moveDownBtnBook = new Button();
+            removeBookBtn = new Button();
+            removeAllBookBtn = new Button();
+            addSelectedBook = new Button();
+            addAllBookBtn = new Button();
+
+            //Sorted view
+            moveUpBtnBook.Width = 75;
+            moveUpBtnBook.Height = 25;
+            moveUpBtnBook.Content = "Move Up";
+            moveUpBtnBook.Click += MoveUpBook_Click;
+            moveUpBtnBook.HorizontalAlignment = HorizontalAlignment.Center;
+            moveUpBtnBook.Margin = new Thickness(10, 2, 10, 0);
+
+            moveDownBtnBook.Width = 75;
+            moveDownBtnBook.Height = 25;
+            moveDownBtnBook.Content = "Move Down";
+            moveDownBtnBook.Click += MoveDownBook_Click;
+            moveDownBtnBook.HorizontalAlignment = HorizontalAlignment.Center;
+            moveDownBtnBook.Margin = new Thickness(10, 2, 90, 0);
+
+            removeBookBtn.Width = 75;
+            removeBookBtn.Height = 25;
+            removeBookBtn.Content = "Remove One";
+            removeBookBtn.Click += RemoveBook_Click;
+            removeBookBtn.HorizontalAlignment = HorizontalAlignment.Center;
+            removeBookBtn.Margin = new Thickness(10, 2, 10, 0);
+
+            removeAllBookBtn.Width = 75;
+            removeAllBookBtn.Height = 25;
+            removeAllBookBtn.Content = "Remove All";
+            removeAllBookBtn.Click += RemoveAllBook_Click;
+            removeAllBookBtn.HorizontalAlignment = HorizontalAlignment.Center;
+            removeAllBookBtn.Margin = new Thickness(10, 2, 10, 0);
+
+            addSelectedBook.Width = 75;
+            addSelectedBook.Height = 25;
+            addSelectedBook.Content = "Add One";
+            addSelectedBook.Click += AddBook_Click;
+            addSelectedBook.HorizontalAlignment = HorizontalAlignment.Center;
+            addSelectedBook.Margin = new Thickness(90, 2, 10, 0);
+
+            addAllBookBtn.Width = 75;
+            addAllBookBtn.Height = 25;
+            addAllBookBtn.Content = "Add All";
+            addAllBookBtn.Click += AddAllBook_Click;
+            addAllBookBtn.HorizontalAlignment = HorizontalAlignment.Center;
+            addAllBookBtn.Margin = new Thickness(10, 2, 10, 0);
+
+            Grid.SetColumn(moveUpBtnBook, 0);
+            controlsGrid.Children.Add(moveUpBtnBook);
+            Grid.SetColumn(moveDownBtnBook, 1);
+            controlsGrid.Children.Add(moveDownBtnBook);
+            Grid.SetColumn(removeBookBtn, 2);
+            controlsGrid.Children.Add(removeBookBtn);
+            Grid.SetColumn(removeAllBookBtn, 3);
+            controlsGrid.Children.Add(removeAllBookBtn);
+            Grid.SetColumn(addSelectedBook, 4);
+            controlsGrid.Children.Add(addSelectedBook);
+            Grid.SetColumn(addAllBookBtn, 5);
+            controlsGrid.Children.Add(addAllBookBtn);
+
+            groupBoxControls.Content = controlsGrid;
+            groupBoxBefore.Content = sVBefore;
+            groupBoxAfter.Content = sVAfter;
+            subWindowBook.Content = gridMain;
+        }
+        private void OpenItemSortedBook_Click(object sender, RoutedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+        private void SaveItemSortedBook_Click(object sender, RoutedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+        private void MoveUpBook_Click(object sender, RoutedEventArgs e)
+        {
+            if (lSBtnAfterBook >= 0 && lSBtnAfterBook < sortedChapters.Count())
+            {
+                sVAfterBook.Items.Clear();
+                lSBtnSortedBook.Clear();
+                sortedChapters = SwapBook(lSBtnAfterBook, lSBtnAfterBook - 1);
+                Button last;
+                int tmpId = 0;
+                foreach (Chapter chapter in sortedChapters)
+                {
+                    last = new Button
+                    {
+                        Content = chapter.GetChapterName(),
+                        Tag = tmpId,
+                        Width = sVBeforeBook.Width - 20,
+                        Height = 25
+                    };
+                    last.Click += SetAfterSelectionBook_Click;
+                    lSBtnSortedBook.Add(last);
+                    sVAfterBook.Items.Add(last);
+                    tmpId++;
+                }
+            }
+        }
+        private List<Page> SwapChapter(int a, int b)
+        {
+            Page tmp = sortedPages[a];
+            sortedPages[a] = sortedPages[b];
+            sortedPages[b] = tmp;
+            return sortedPages;
+        }
+        private List<Chapter> SwapBook(int a, int b)
+        {
+            Chapter tmp = sortedChapters[a];
+            sortedChapters[a] = sortedChapters[b];
+            sortedChapters[b] = tmp;
+            return sortedChapters;
+        }
+        private void MoveDownBook_Click(object sender, RoutedEventArgs e)
+        {
+            if (lSBtnAfterBook >= 0 && lSBtnAfterBook + 1 < sortedChapters.Count())
+            {
+                sVAfterBook.Items.Clear();
+                lSBtnSortedBook.Clear();
+                sortedChapters = SwapBook(lSBtnAfterBook, lSBtnAfterBook - 1);
+                Button last;
+                int tmpId = 0;
+                foreach (Chapter chapter in sortedChapters)
+                {
+                    last = new Button
+                    {
+                        Content = chapter.GetChapterName(),
+                        Tag = tmpId,
+                        Width = sVBeforeBook.Width - 20,
+                        Height = 25
+                    };
+                    last.Click += SetAfterSelectionBook_Click;
+                    lSBtnSortedBook.Add(last);
+                    sVAfterBook.Items.Add(last);
+                    tmpId++;
+                }
+            }
+        }
+        private void RemoveBook_Click(object sender, RoutedEventArgs e)
+        {
+            // First clear all elements 
+            if (lSBtnAfterBook != -1 && lSBtnAfterBook < sortedChapters.Count())
+            {
+                sVAfterBook.Items.RemoveAt(lSBtnAfterBook);
+                lSBtnSortedBook.RemoveAt(lSBtnAfterBook);
+                sortedChapters.RemoveAt(lSBtnAfterBook);
+                lSBtnAfterBook = -1;
+            }
+            // if item is Deleted then retag all items to prevent stack overflow due to incorrect list usage
+            sVAfterBook.Items.Clear();
+            int tmpId = 0;
+            foreach (Button btn in lSBtnSortedBook)
+            {
+                btn.Tag = tmpId;
+                sVAfterBook.Items.Add(btn);
+                tmpId++;
+            }
+        }
+        private void RemoveAllBook_Click(object sender, RoutedEventArgs e)
+        {
+            // First clear all elements 
+            sVAfterBook.Items.Clear();
+            lSBtnSortedBook.Clear();
+            sortedChapters.Clear();
+            lSBtnAfterBook = -1;
+        }
+        private void AddBook_Click(object sender, RoutedEventArgs e)
+        {
+            if (lSBtnBeforeBook != -1)
+            {
+                Button last = new Button
+                {
+                    Content = chapters[lSBtnBeforeBook].GetChapterName(),
+                    Tag = lSBtnSortedBook.Count(),
+                    Width = sVBeforeBook.Width - 20,
+                    Height = 25
+                };
+                sortedChapters.Add(chapters[lSBtnBeforeBook]);
+                last.Click += SetAfterSelectionBook_Click;
+                lSBtnSortedBook.Add(last);
+                sVAfterBook.Items.Add(last);
+                lSBtnBeforeBook = -1;
+            }
+        }
+        private void AddAllBook_Click(object sender, RoutedEventArgs e)
+        {
+            // First clear all elements 
+            sVAfterBook.Items.Clear();
+            lSBtnSortedBook.Clear();
+            sortedChapters.Clear();
+            // Tmp btn and counting var
+            Button last;
+            int tmpId = 0;
+            // Then add all elements
+            foreach (Chapter chapter in chapters)
+            {
+                last = new Button
+                {
+                    Content = chapter.GetChapterName(),
+                    Tag = tmpId,
+                    Width = sVBefore.Width - 20,
+                    Height = 25
+                };
+                sortedChapters.Add(chapter);
+
+                last.Click += SetAfterSelectionBook_Click;
+                lSBtnSortedBook.Add(last);
+                sVAfter.Items.Add(last);
+                tmpId++;
+            }
+        }
+        private void SetAfterSelectionBook_Click(object sender, RoutedEventArgs e)
+        {
+            Button btn = (Button)sender;
+            foreach (Button b in lSBtnSortedBook)
+            {
+                b.Background = Brushes.White;
+            }
+            lSBtnSortedBook[int.Parse(btn.Tag.ToString())].Background = config.ACCENT_COLOR;
+            lSBtnAfterBook = int.Parse(btn.Tag.ToString());
         }
         private void OpenChapterMode_Click(object sender, RoutedEventArgs e)
         {
+            // First open new page
+            Window subWindowChapter = new Window();
+            subWindowChapter.Show();
+            subWindowChapter.Height = 500;
+            subWindowChapter.Width = 800;
+            subWindowChapter.Title = "Chapter_Mode";
+            // Draw GroupBox and Grid
+            Grid grid = new Grid(), gridMain = new Grid(), controlsGrid = new Grid();
+            GroupBox groupBoxMain = new GroupBox();
+            groupBoxMain.Width = subWindowChapter.Width - 40;
+            groupBoxMain.Height = subWindowChapter.Height - 70;
+            groupBoxMain.VerticalAlignment = VerticalAlignment.Center;
+            groupBoxMain.HorizontalAlignment = HorizontalAlignment.Center;
+            groupBoxMain.Header = "Chapter Order Selector";
+            groupBoxMain.Margin = new Thickness(5);
+            GroupBox groupBoxBefore = new GroupBox();
+            groupBoxBefore.Width = subWindowChapter.Width / 2 - 40;
+            groupBoxBefore.Height = subWindowChapter.Height - 160;
+            groupBoxBefore.VerticalAlignment = VerticalAlignment.Center;
+            groupBoxBefore.HorizontalAlignment = HorizontalAlignment.Left;
+            groupBoxBefore.Header = "Non-Sorted View";
+            groupBoxBefore.Margin = new Thickness(5);
+            GroupBox groupBoxAfter = new GroupBox();
+            groupBoxAfter.Width = subWindowChapter.Width / 2 - 40;
+            groupBoxAfter.Height = subWindowChapter.Height - 160;
+            groupBoxAfter.VerticalAlignment = VerticalAlignment.Center;
+            groupBoxAfter.HorizontalAlignment = HorizontalAlignment.Right;
+            groupBoxAfter.Header = "Sorted View";
+            groupBoxAfter.Margin = new Thickness(5);
+            GroupBox groupBoxControls = new GroupBox();
+            groupBoxControls.Width = subWindowChapter.Width - 60;
+            groupBoxControls.Height = 55;
+            groupBoxControls.VerticalAlignment = VerticalAlignment.Center;
+            groupBoxControls.HorizontalAlignment = HorizontalAlignment.Center;
+            groupBoxControls.Header = "Order Controls";
+            groupBoxControls.Margin = new Thickness(5, 5, 5, 0);
 
+            grid.Width = groupBoxMain.Width - 10;
+            grid.Height = groupBoxMain.Height - 10;
+            grid.VerticalAlignment = VerticalAlignment.Center;
+            grid.HorizontalAlignment = HorizontalAlignment.Center;
+
+            controlsGrid.Width = groupBoxControls.Width - 10;
+            controlsGrid.Height = groupBoxControls.Height - 10;
+            controlsGrid.VerticalAlignment = VerticalAlignment.Center;
+            controlsGrid.HorizontalAlignment = HorizontalAlignment.Center;
+
+            gridMain.Width = subWindowChapter.Width;
+            gridMain.Height = subWindowChapter.Height;
+            gridMain.VerticalAlignment = VerticalAlignment.Center;
+            gridMain.HorizontalAlignment = HorizontalAlignment.Center;
+
+            // Add selector controls
+            sVBefore = new ListBox
+            {
+                Height = groupBoxAfter.Height - 30,
+                Width = subWindowChapter.Width / 2 - 60,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+                Background = Brushes.AntiqueWhite,
+                Margin = new Thickness(1)
+            };
+            sVAfter = new ListBox
+            {
+                Height = groupBoxAfter.Height - 30,
+                Width = subWindowChapter.Width / 2 - 60,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+                Background = Brushes.AntiqueWhite,
+                Margin = new Thickness(1)
+            };
+
+            Menu menu = new Menu
+            {
+                Margin = new Thickness(5, 20, 0, 0)
+            };
+            MenuItem file = new MenuItem
+            {
+                Header = " File"
+            };
+            MenuItem saveMenuItem = new MenuItem
+            {
+                Header = " Save"
+            };
+            saveMenuItem.Click += SaveItemSortedChapter_Click;
+            MenuItem loadMenuItem = new MenuItem
+            {
+                Header = " Load"
+            };
+            loadMenuItem.Click += OpenItemSortedChapter_Click;
+
+            //menu.Background = Brushes.Red;
+            menu.Items.Insert(0, file);
+            file.Items.Insert(0, saveMenuItem);
+            file.Items.Insert(1, loadMenuItem);
+
+
+            RowDefinition row;
+            gridMain.RowDefinitions.Clear();
+            row = new RowDefinition
+            {
+                Height = new GridLength(25, GridUnitType.Auto)
+            };
+            gridMain.RowDefinitions.Add(row);
+            row = new RowDefinition
+            {
+                Height = new GridLength(25, GridUnitType.Auto)
+            };
+            gridMain.RowDefinitions.Add(row);
+
+            Grid.SetRow(menu, 0);
+            gridMain.Children.Add(menu);
+            Grid.SetRow(groupBoxMain, 1);
+            gridMain.Children.Add(groupBoxMain);
+
+            groupBoxMain.Content = grid;
+
+            row = new RowDefinition
+            {
+                Height = new GridLength(25, GridUnitType.Auto)
+            };
+            grid.RowDefinitions.Add(row);
+            row = new RowDefinition
+            {
+                Height = new GridLength(25, GridUnitType.Auto)
+            };
+            grid.RowDefinitions.Add(row);
+
+
+            Grid.SetRow(groupBoxControls, 0);
+            grid.Children.Add(groupBoxControls);
+            Grid.SetRow(groupBoxBefore, 1);
+            grid.Children.Add(groupBoxBefore);
+            Grid.SetRow(groupBoxAfter, 1);
+            grid.Children.Add(groupBoxAfter);
+
+            ColumnDefinition column;
+            column = new ColumnDefinition
+            {
+                Width = new GridLength(25, GridUnitType.Auto)
+            };
+            controlsGrid.ColumnDefinitions.Add(column);
+            column = new ColumnDefinition
+            {
+                Width = new GridLength(25, GridUnitType.Auto)
+            };
+            controlsGrid.ColumnDefinitions.Add(column);
+            column = new ColumnDefinition
+            {
+                Width = new GridLength(25, GridUnitType.Auto)
+            };
+            controlsGrid.ColumnDefinitions.Add(column);
+            column = new ColumnDefinition
+            {
+                Width = new GridLength(25, GridUnitType.Auto)
+            };
+            controlsGrid.ColumnDefinitions.Add(column);
+            column = new ColumnDefinition
+            {
+                Width = new GridLength(25, GridUnitType.Auto)
+            };
+            controlsGrid.ColumnDefinitions.Add(column);
+            column = new ColumnDefinition
+            {
+                Width = new GridLength(25, GridUnitType.Auto)
+            };
+            controlsGrid.ColumnDefinitions.Add(column);
+
+            moveUpBtnChapter = new Button();
+            moveDownBtnChapter = new Button();
+            removeChapterBtn = new Button();
+            removeAllChapterBtn = new Button();
+            addSelectedChapter = new Button();
+            addAllChapterBtn = new Button();
+
+            //Sorted view
+            moveUpBtnChapter.Width = 75;
+            moveUpBtnChapter.Height = 25;
+            moveUpBtnChapter.Content = "Move Up";
+            moveUpBtnChapter.Click += MoveUpChapter_Click;
+            moveUpBtnChapter.HorizontalAlignment = HorizontalAlignment.Center;
+            moveUpBtnChapter.Margin = new Thickness(10, 2, 10, 0);
+
+            moveDownBtnChapter.Width = 75;
+            moveDownBtnChapter.Height = 25;
+            moveDownBtnChapter.Content = "Move Down";
+            moveDownBtnChapter.Click += MoveDownChapter_Click;
+            moveDownBtnChapter.HorizontalAlignment = HorizontalAlignment.Center;
+            moveDownBtnChapter.Margin = new Thickness(10, 2, 90, 0);
+
+            removeChapterBtn.Width = 75;
+            removeChapterBtn.Height = 25;
+            removeChapterBtn.Content = "Remove One";
+            removeChapterBtn.Click += RemoveChapter_Click;
+            removeChapterBtn.HorizontalAlignment = HorizontalAlignment.Center;
+            removeChapterBtn.Margin = new Thickness(10, 2, 10, 0);
+
+            removeAllChapterBtn.Width = 75;
+            removeAllChapterBtn.Height = 25;
+            removeAllChapterBtn.Content = "Remove All";
+            removeAllChapterBtn.Click += RemoveAllChapter_Click;
+            removeAllChapterBtn.HorizontalAlignment = HorizontalAlignment.Center;
+            removeAllChapterBtn.Margin = new Thickness(10, 2, 10, 0);
+
+            addSelectedChapter.Width = 75;
+            addSelectedChapter.Height = 25;
+            addSelectedChapter.Content = "Add One";
+            addSelectedChapter.Click += AddChapter_Click;
+            addSelectedChapter.HorizontalAlignment = HorizontalAlignment.Center;
+            addSelectedChapter.Margin = new Thickness(90, 2, 10, 0);
+
+            addAllChapterBtn.Width = 75;
+            addAllChapterBtn.Height = 25;
+            addAllChapterBtn.Content = "Add All";
+            addAllChapterBtn.Click += AddAllChapter_Click;
+            addAllChapterBtn.HorizontalAlignment = HorizontalAlignment.Center;
+            addAllChapterBtn.Margin = new Thickness(10, 2, 10, 0);
+
+            Grid.SetColumn(moveUpBtnChapter, 0);
+            controlsGrid.Children.Add(moveUpBtnChapter);
+            Grid.SetColumn(moveDownBtn, 1);
+            controlsGrid.Children.Add(moveDownBtn);
+            Grid.SetColumn(removeChapterBtn, 2);
+            controlsGrid.Children.Add(removeChapterBtn);
+            Grid.SetColumn(removeAllChapterBtn, 3);
+            controlsGrid.Children.Add(removeAllChapterBtn);
+            Grid.SetColumn(addSelectedChapter, 4);
+            controlsGrid.Children.Add(addSelectedChapter);
+            Grid.SetColumn(addAllChapterBtn, 5);
+            controlsGrid.Children.Add(addAllChapterBtn);
+
+            groupBoxControls.Content = controlsGrid;
+            groupBoxBefore.Content = sVBefore;
+            groupBoxAfter.Content = sVAfter;
+            subWindowChapter.Content = gridMain;
+        }
+        private void MoveUpChapter_Click(object sender, RoutedEventArgs e)
+        {
+            if (lSBtnAfterChapter >= 0 && lSBtnAfterChapter < sortedChapters.Count())
+            {
+                sVAfterChapter.Items.Clear();
+                lSBtnSortedChapter.Clear();
+                sortedPages = SwapChapter(lSBtnAfterChapter, lSBtnAfterChapter - 1);
+                Button last;
+                int tmpId = 0;
+                foreach (Chapter chapter in sortedChapters)
+                {
+                    last = new Button
+                    {
+                        Content = chapter.GetChapterName(),
+                        Tag = tmpId,
+                        Width = sVBeforeChapter.Width - 20,
+                        Height = 25
+                    };
+                    last.Click += SetAfterSelectionChapter_Click;
+                    lSBtnSortedChapter.Add(last);
+                    sVAfterChapter.Items.Add(last);
+                    tmpId++;
+                }
+            }
+        }
+        private void MoveDownChapter_Click(object sender, RoutedEventArgs e)
+        {
+          if (lSBtnAfterChapter >= 0 && lSBtnAfterChapter + 1 < sortedChapters.Count())
+            {
+                sVAfterChapter.Items.Clear();
+                lSBtnSortedChapter.Clear();
+                sortedPages = SwapChapter(lSBtnAfterChapter, lSBtnAfterChapter - 1);
+                Button last;
+                int tmpId = 0;
+                foreach (Chapter chapter in sortedChapters)
+                {
+                    last = new Button
+                    {
+                        Content = chapter.GetChapterName(),
+                        Tag = tmpId,
+                        Width = sVBeforeChapter.Width - 20,
+                        Height = 25
+                    };
+                    last.Click += SetAfterSelectionChapter_Click;
+                    lSBtnSortedChapter.Add(last);
+                    sVAfterChapter.Items.Add(last);
+                    tmpId++;
+                }
+            }
+        }
+        private void RemoveChapter_Click(object sender, RoutedEventArgs e)
+        {
+            // First clear all elements 
+            if (lSBtnAfterChapter != -1 && lSBtnAfterChapter < sortedPages.Count())
+            {
+                sVAfterChapter.Items.RemoveAt(lSBtnAfterChapter);
+                lSBtnSortedChapter.RemoveAt(lSBtnAfterChapter);
+                sortedPages.RemoveAt(lSBtnAfterChapter);
+                lSBtnAfterChapter = -1;
+            }
+            // if item is Deleted then retag all items to prevent stack overflow due to incorrect list usage
+            sVAfterChapter.Items.Clear();
+            int tmpId = 0;
+            foreach (Button btn in lSBtnSortedChapter)
+            {
+                btn.Tag = tmpId;
+                sVAfterChapter.Items.Add(btn);
+                tmpId++;
+            }
+        }
+        private void RemoveAllChapter_Click(object sender, RoutedEventArgs e)
+        {
+            // First clear all elements 
+            sVAfterChapter.Items.Clear();
+            lSBtnSortedChapter.Clear();
+            sortedPages.Clear();
+            lSBtnAfterChapter = -1;
+        }
+        private void AddChapter_Click(object sender, RoutedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+        private void AddAllChapter_Click(object sender, RoutedEventArgs e)
+        {
+            // First clear all elements 
+            sVAfterChapter.Items.Clear();
+            lSBtnSortedChapter.Clear();
+            sortedChapters.Clear();
+            // Tmp btn and counting var
+            Button last;
+            int tmpId = 0;
+            // Then add all elements
+            foreach (Page page in pages)
+            {
+                last = new Button
+                {
+                    Content = page.Getname(),
+                    Tag = tmpId,
+                    Width = sVBefore.Width - 20,
+                    Height = 25
+                };
+                sortedPages.Add(page);
+
+                last.Click += SetAfterSelectionChapter_Click;
+                lSBtnSortedChapter.Add(last);
+                sVAfter.Items.Add(last);
+                tmpId++;
+            }
+        }
+        private void SetAfterSelectionChapter_Click(object sender, RoutedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+        private void SaveItemSortedChapter_Click(object sender, RoutedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+        private void OpenItemSortedChapter_Click(object sender, RoutedEventArgs e)
+        {
+            throw new NotImplementedException();
         }
         private void OpenPageMode_Click(object sender, RoutedEventArgs e)
         {
@@ -447,7 +1226,7 @@ namespace LayTexFileCreator
             subWindow.Show();
             subWindow.Height = 500;
             subWindow.Width = 800;
-            subWindow.Name = "Chapter_Mode";
+            subWindow.Title = "Page_Mode";
             // Draw GroupBox and Grid
             Grid grid = new Grid(), gridMain = new Grid(), controlsGrid = new Grid();
             GroupBox groupBoxMain = new GroupBox();
@@ -499,7 +1278,7 @@ namespace LayTexFileCreator
             gridMain.HorizontalAlignment = HorizontalAlignment.Center;
             //grid.Margin = new Thickness(5);
             // Add selector controls
-            scrollViewerBefore = new ListBox
+            sVBefore = new ListBox
             {
                 Height = groupBoxAfter.Height - 30,
                 Width = subWindow.Width / 2 - 60,
@@ -508,7 +1287,7 @@ namespace LayTexFileCreator
                 Background = Brushes.AntiqueWhite,
                 Margin = new Thickness(1)
             };
-            scrollViewerAfter = new ListBox
+            sVAfter = new ListBox
             {
                 Height = groupBoxAfter.Height - 30,
                 Width = subWindow.Width / 2 - 60,
@@ -518,8 +1297,6 @@ namespace LayTexFileCreator
                 Margin = new Thickness(1)
             };
 
-            //  List<Button> beforeList = new List<Button>();
-            //  List<Button> afterList = new List<Button>();
             Menu menu = new Menu
             {
                 Margin = new Thickness(5, 20, 0, 0)
@@ -539,26 +1316,11 @@ namespace LayTexFileCreator
             };
             loadMenuItem.Click += OpenItemSorted_Click;
 
-            MenuItem bookView = new MenuItem
-            {
-                Header = " View Book Mode"
-            };
-            MenuItem chapterView = new MenuItem
-            {
-                Header = " View Chapter Mode"
-            };
-            MenuItem modes = new MenuItem
-            {
-                Header = " Modes"
-            };
-
             //menu.Background = Brushes.Red;
             menu.Items.Insert(0, file);
-            menu.Items.Insert(1, modes);
             file.Items.Insert(0, saveMenuItem);
             file.Items.Insert(1, loadMenuItem);
-            modes.Items.Insert(0, chapterView);
-            modes.Items.Insert(0, bookView);
+
 
             RowDefinition row;
             gridMain.RowDefinitions.Clear();
@@ -693,13 +1455,10 @@ namespace LayTexFileCreator
             controlsGrid.Children.Add(addSelectedElement);
             Grid.SetColumn(addAllElementBtn, 5);
             controlsGrid.Children.Add(addAllElementBtn);
-            //removeElementBtn = new Button(), moveUpBtn = new Button(),
-            //moveDownBtn = new Button(), removeAllElementBtn = new Button(),
-            //addAllElementBtn = new Button(), addSelectedElement = new Button()
 
             groupBoxControls.Content = controlsGrid;
-            groupBoxBefore.Content = scrollViewerBefore;
-            groupBoxAfter.Content = scrollViewerAfter;
+            groupBoxBefore.Content = sVBefore;
+            groupBoxAfter.Content = sVAfter;
 
 
             // gridMain.Children.Add(groupBox);
@@ -728,9 +1487,9 @@ namespace LayTexFileCreator
         }
         private void Element_click(object sender, RoutedEventArgs e)
         {
-            Button button = (Button)sender;
+            Button btn = (Button)sender;
             addBtn.Content = "Update Element";
-            string[] strlist = button.Tag.ToString().Split(',');
+            string[] strlist = btn.Tag.ToString().Split(',');
             if (strlist[0] == "Paragraph")
             {
                 InitlizeParagraph(strlist[1]);
@@ -1016,10 +1775,10 @@ namespace LayTexFileCreator
         private void AddAllElement_Click(object sender, RoutedEventArgs e)
         {
             // First clear all elements 
-            scrollViewerAfter.Items.Clear();
-            lastSelectedButtonSorted.Clear();
+            sVAfter.Items.Clear();
+            lSBtnSorted.Clear();
             sortedElements.Clear();
-            // Tmp button and counting var
+            // Tmp btn and counting var
             Button last;
             int tmpId = 0;
             // Then add all elements
@@ -1029,70 +1788,70 @@ namespace LayTexFileCreator
                 {
                     Content = "(" + el.GetElementType() + ") " + el.GetTitle(),
                     Tag = tmpId,
-                    Width = scrollViewerBefore.Width - 20,
+                    Width = sVBefore.Width - 20,
                     Height = 25
                 };
                 sortedElements.Add(el);
 
                 last.Click += SetAfterSelection_Click;
-                lastSelectedButtonSorted.Add(last);
-                scrollViewerAfter.Items.Add(last);
+                lSBtnSorted.Add(last);
+                sVAfter.Items.Add(last);
                 tmpId++;
             }
         }
         private void SetAfterSelection_Click(object sender, RoutedEventArgs e)
         {
-            Button button = (Button)sender;
-            foreach (Button b in lastSelectedButtonSorted)
+            Button btn = (Button)sender;
+            foreach (Button b in lSBtnSorted)
             {
                 b.Background = Brushes.White;
             }
-            lastSelectedButtonSorted[int.Parse(button.Tag.ToString())].Background = config.ACCENT_COLOR;
-            lastSelectedButtonAfter = int.Parse(button.Tag.ToString());
+            lSBtnSorted[int.Parse(btn.Tag.ToString())].Background = config.ACCENT_COLOR;
+            lSBtnAfter = int.Parse(btn.Tag.ToString());
         }
         private void AddElement_Click(object sender, RoutedEventArgs e)
         {
-            if (lastSelectedButtonBefore != -1)
+            if (lSBtnBefore != -1)
             {
                 Button last = new Button
                 {
-                    Content = "(" + elements[lastSelectedButtonBefore].GetElementType() + ") " + elements[lastSelectedButtonBefore].GetTitle(),
-                    Tag = lastSelectedButtonSorted.Count(),
-                    Width = scrollViewerBefore.Width - 20,
+                    Content = "(" + elements[lSBtnBefore].GetElementType() + ") " + elements[lSBtnBefore].GetTitle(),
+                    Tag = lSBtnSorted.Count(),
+                    Width = sVBefore.Width - 20,
                     Height = 25
                 };
-                sortedElements.Add(elements[lastSelectedButtonBefore]);
+                sortedElements.Add(elements[lSBtnBefore]);
                 last.Click += SetAfterSelection_Click;
-                lastSelectedButtonSorted.Add(last);
-                scrollViewerAfter.Items.Add(last);
-                lastSelectedButtonBefore = -1;
+                lSBtnSorted.Add(last);
+                sVAfter.Items.Add(last);
+                lSBtnBefore = -1;
             }
         }
         private void RemoveAllElement_Click(object sender, RoutedEventArgs e)
         {
             // First clear all elements 
-            scrollViewerAfter.Items.Clear();
-            lastSelectedButtonSorted.Clear();
+            sVAfter.Items.Clear();
+            lSBtnSorted.Clear();
             sortedElements.Clear();
-            lastSelectedButtonAfter = -1;
+            lSBtnAfter = -1;
         }
         private void RemoveElement_Click(object sender, RoutedEventArgs e)
         {
             // First clear all elements 
-            if (lastSelectedButtonAfter != -1 && lastSelectedButtonAfter < sortedElements.Count())
+            if (lSBtnAfter != -1 && lSBtnAfter < sortedElements.Count())
             {
-                scrollViewerAfter.Items.RemoveAt(lastSelectedButtonAfter);
-                lastSelectedButtonSorted.RemoveAt(lastSelectedButtonAfter);
-                sortedElements.RemoveAt(lastSelectedButtonAfter);
-                lastSelectedButtonAfter = -1;
+                sVAfter.Items.RemoveAt(lSBtnAfter);
+                lSBtnSorted.RemoveAt(lSBtnAfter);
+                sortedElements.RemoveAt(lSBtnAfter);
+                lSBtnAfter = -1;
             }
             // if item is Deleted then retag all items to prevent stack overflow due to incorrect list usage
-            scrollViewerAfter.Items.Clear();
+            sVAfter.Items.Clear();
             int tmpId = 0;
-            foreach (Button button in lastSelectedButtonSorted)
+            foreach (Button btn in lSBtnSorted)
             {
-                button.Tag = tmpId;
-                scrollViewerAfter.Items.Add(button);
+                btn.Tag = tmpId;
+                sVAfter.Items.Add(btn);
                 tmpId++;
             }
 
@@ -1106,11 +1865,11 @@ namespace LayTexFileCreator
         }
         private void MoveElementUp_Click(object sender, RoutedEventArgs e)
         {
-            if (lastSelectedButtonAfter >= 0 && lastSelectedButtonAfter < sortedElements.Count())
+            if (lSBtnAfter >= 0 && lSBtnAfter < sortedElements.Count())
             {
-                scrollViewerAfter.Items.Clear();
-                lastSelectedButtonSorted.Clear();
-                sortedElements = Swap(lastSelectedButtonAfter, lastSelectedButtonAfter - 1);
+                sVAfter.Items.Clear();
+                lSBtnSorted.Clear();
+                sortedElements = Swap(lSBtnAfter, lSBtnAfter - 1);
                 Button last;
                 int tmpId = 0;
                 foreach (Element el in sortedElements)
@@ -1119,23 +1878,23 @@ namespace LayTexFileCreator
                     {
                         Content = "(" + el.GetElementType() + ") " + el.GetTitle(),
                         Tag = tmpId,
-                        Width = scrollViewerBefore.Width - 20,
+                        Width = sVBefore.Width - 20,
                         Height = 25
                     };
                     last.Click += SetAfterSelection_Click;
-                    lastSelectedButtonSorted.Add(last);
-                    scrollViewerAfter.Items.Add(last);
+                    lSBtnSorted.Add(last);
+                    sVAfter.Items.Add(last);
                     tmpId++;
                 }
             }
         }
         private void MoveElementDown_Click(object sender, RoutedEventArgs e)
         {
-            if (lastSelectedButtonAfter >= 0 && lastSelectedButtonAfter + 1 < sortedElements.Count())
+            if (lSBtnAfter >= 0 && lSBtnAfter + 1 < sortedElements.Count())
             {
-                scrollViewerAfter.Items.Clear();
-                lastSelectedButtonSorted.Clear();
-                sortedElements = Swap(lastSelectedButtonAfter, lastSelectedButtonAfter + 1);
+                sVAfter.Items.Clear();
+                lSBtnSorted.Clear();
+                sortedElements = Swap(lSBtnAfter, lSBtnAfter + 1);
                 Button last;
                 int tmpId = 0;
                 foreach (Element el in sortedElements)
@@ -1144,12 +1903,12 @@ namespace LayTexFileCreator
                     {
                         Content = "(" + el.GetElementType() + ") " + el.GetTitle(),
                         Tag = tmpId,
-                        Width = scrollViewerBefore.Width - 20,
+                        Width = sVBefore.Width - 20,
                         Height = 25
                     };
                     last.Click += SetAfterSelection_Click;
-                    lastSelectedButtonSorted.Add(last);
-                    scrollViewerAfter.Items.Add(last);
+                    lSBtnSorted.Add(last);
+                    sVAfter.Items.Add(last);
                     tmpId++;
                 }
 
@@ -1200,7 +1959,7 @@ namespace LayTexFileCreator
             selectedId = id;
             grid.Children.Clear();
             sv.Content = null;
-            // Reset Image, image button, Size selection radio buttons
+            // Reset Image, image btn, Size selection radio btns
             titleLabel.Content = "Figure subtext";
             titleLabel.Width = 100;
             title = new TextBox
@@ -1334,8 +2093,8 @@ namespace LayTexFileCreator
         }
         private void UpdateImageSize(object sender, RoutedEventArgs e)
         {
-            RadioButton button = (RadioButton)sender;
-            elements[selectedId].SetImageSize(int.Parse(button.Tag.ToString()));
+            RadioButton btn = (RadioButton)sender;
+            elements[selectedId].SetImageSize(int.Parse(btn.Tag.ToString()));
         }
         private void InitlizeTable(int id)
         {
@@ -1347,7 +2106,7 @@ namespace LayTexFileCreator
             sv.Content = null;
             tableGrid = new Grid();
             tableData = new List<List<TextBox>>();
-            // Reset Image, image button, Size selection radio buttons
+            // Reset Image, image btn, Size selection radio btns
             titleLabel.Content = "Table Title";
             titleLabel.Width = 100;
             title = new TextBox
