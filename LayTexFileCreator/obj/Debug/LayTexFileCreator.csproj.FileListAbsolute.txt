@@ -1,7 +1,6 @@
 C:\Users\jjlor\source\repos\LayTexFileCreator\LayTexFileCreator\bin\Debug\LayTexFileCreator.exe.config
 C:\Users\jjlor\source\repos\LayTexFileCreator\LayTexFileCreator\bin\Debug\LayTexFileCreator.exe
 C:\Users\jjlor\source\repos\LayTexFileCreator\LayTexFileCreator\bin\Debug\LayTexFileCreator.pdb
-C:\Users\jjlor\source\repos\LayTexFileCreator\LayTexFileCreator\obj\Debug\LayTexFileCreator.csprojAssemblyReference.cache
 C:\Users\jjlor\source\repos\LayTexFileCreator\LayTexFileCreator\obj\Debug\MainWindow.g.cs
 C:\Users\jjlor\source\repos\LayTexFileCreator\LayTexFileCreator\obj\Debug\App.g.cs
 C:\Users\jjlor\source\repos\LayTexFileCreator\LayTexFileCreator\obj\Debug\LayTexFileCreator_MarkupCompile.cache
@@ -17,3 +16,11 @@ C:\Users\jjlor\source\repos\LayTexFileCreator\LayTexFileCreator\bin\Debug\Micros
 C:\Users\jjlor\source\repos\LayTexFileCreator\LayTexFileCreator\bin\Debug\Microsoft.WindowsAPICodePack.xml
 C:\Users\jjlor\source\repos\LayTexFileCreator\LayTexFileCreator\bin\Debug\Microsoft.WindowsAPICodePack.Shell.xml
 C:\Users\jjlor\source\repos\LayTexFileCreator\LayTexFileCreator\obj\Debug\LayTexFileCreator.csproj.CopyComplete
+C:\Users\jjlor\source\repos\LayTexFileCreator\LayTexFileCreator\bin\Debug\MaterialDesignColors.dll
+C:\Users\jjlor\source\repos\LayTexFileCreator\LayTexFileCreator\bin\Debug\MaterialDesignThemes.Wpf.dll
+C:\Users\jjlor\source\repos\LayTexFileCreator\LayTexFileCreator\bin\Debug\MaterialDesignColors.pdb
+C:\Users\jjlor\source\repos\LayTexFileCreator\LayTexFileCreator\bin\Debug\MaterialDesignThemes.Wpf.pdb
+C:\Users\jjlor\source\repos\LayTexFileCreator\LayTexFileCreator\bin\Debug\MaterialDesignThemes.Wpf.xml
+C:\Users\jjlor\source\repos\LayTexFileCreator\LayTexFileCreator\obj\Debug\App.baml
+C:\Users\jjlor\source\repos\LayTexFileCreator\LayTexFileCreator\obj\Debug\CustomThemes.baml
+C:\Users\jjlor\source\repos\LayTexFileCreator\LayTexFileCreator\obj\Debug\LayTexFileCreator.csprojAssemblyReference.cache

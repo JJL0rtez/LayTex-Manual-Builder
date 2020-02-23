@@ -11,7 +11,7 @@ using System.Windows.Media.Imaging;
 using System.Xml;
 using System.Xml.Serialization;
 using Microsoft.WindowsAPICodePack.Dialogs;
-
+using System.Windows.Input;
 
 namespace LayTexFileCreator
 {
@@ -20,7 +20,7 @@ namespace LayTexFileCreator
         // Config / Settings
         Config config = new Config();
 
-        List<Element> elements;
+        List<Element> elements = new List<Element>();
         List<Page> pages = new List<Page>();
         List<Chapter> chapters = new List<Chapter>();
 
@@ -33,7 +33,7 @@ namespace LayTexFileCreator
         Button removeElementBtn = new Button(), moveUpBtn = new Button(),
             moveDownBtn = new Button(), removeAllElementBtn = new Button(),
             addAllElementBtn = new Button(), addSelectedElement = new Button();
-        ListBox sVBefore, sVAfter;
+        ListBox sVBefore = new ListBox(), sVAfter = new ListBox();
         // Sorting elements vars
         List<Page> sortedPages = new List<Page>();
         List<Button> lSBtnChapter = new List<Button>(), lSBtnSortedChapter = new List<Button>();
@@ -58,7 +58,7 @@ namespace LayTexFileCreator
         Grid popupGrid = new Grid();
 
         // Create wpf elements
-        TextBox title = new TextBox(), body = new TextBox();
+        TextBox body = new TextBox(), title = new TextBox();
         Grid grid = new Grid();
         Label titleLabel = new Label(), bodyLabel = new Label();
         Button deleteBtn = new Button(), addBtn = new Button();
@@ -76,6 +76,7 @@ namespace LayTexFileCreator
         RadioButton mediumImage = new RadioButton();
         RadioButton largeImage = new RadioButton();
         string selectedFile = "";
+        int tmpImageSize = 1;
 
         // Table
         List<List<TextBox>> tableData = new List<List<TextBox>>();
@@ -89,11 +90,20 @@ namespace LayTexFileCreator
         Button saveButton = new Button(), cancelButton = new Button();
         TextBox popupTextbox = new TextBox();
 
-        //
+        // Initial window grid
+        Grid initialWindowGrid = new Grid();
         
 
         public MainWindow()
         {
+            //OpenInitialWindow();
+            InitlizePageEditor();
+            //this.Mouse.
+        }
+
+        private void InitlizePageEditor()
+        {
+            //InitlizePageEditor();
             InitializeComponent();
             elements = new List<Element>();
             InitialSetup();
@@ -102,6 +112,26 @@ namespace LayTexFileCreator
             title.Text = "";
             InitlizeParagraph("-1");
         }
+
+        private void OpenInitialWindow()
+        {
+            Window initialWindow = new Window();
+            initialWindow.Content = initialWindowGrid;
+            initialWindow.Width = 800;
+            initialWindow.Height = 600;
+            initialWindow.Show();
+            initialWindow.Title = "Stonetown Karate Manual Editor";
+
+            initialWindowGrid.Width = initialWindow.Width;
+            initialWindowGrid.Height = initialWindow.Height;
+        }
+
+        /*
+         * Method Name: AddParagraph_Click
+         * Method Description: Runs when the "Paragraph" button on the page editor is clicked. Calls 
+         *                     on the Initlize paragraph method with a parameter of -1 in order to
+         *                     start a new paragraph activity.
+         */
         private void AddParagraph_Click(object sender, RoutedEventArgs e)
         {
 
@@ -110,20 +140,12 @@ namespace LayTexFileCreator
             title.Text = "";
             InitlizeParagraph("-1");
         }
-        private void UpdateBody(object sender, TextChangedEventArgs e)
-        {
-            //if (body.Text != "")
-            //{
-            //    currentBody = body.Text;
-            //}
-        }
-        private void UpdateTitle(object sender, TextChangedEventArgs e)
-        {
-            //  if (title.Text != "")
-            //   {
-            //currentTitle = title.Text;
-            //  }
-        }
+        /*
+         * Method Name: AddParagraph_Click
+         * Method Description: Triggered by the "Add element" button this method calls SaveData to 
+         *                     save the current element and UpdateElementList to update the element
+         *                     list.
+         */
         private void AddClick(object sender, RoutedEventArgs e)
         {
             Button btn = (Button)sender;
@@ -132,39 +154,56 @@ namespace LayTexFileCreator
             UpdateElementList();
             addBtn.Content = "Update Element";
         }
+        /*
+         * Method Name: PushItem_Click
+         * Method Description: Triggered by Git-->Push this method calls the file SaveFiles.bat as a process.
+         */
         private void PushItem_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                Process.Start("SaveFiles.bat");
+                Process.Start("../SaveFiles.bat");
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
             }
         }
+        /*
+         * Method Name: CompileItem_Click
+         * Method Description: Triggered by Compile-->Compile to Book this method calls the CompileBook method from LayTex.cs 
+         */
         private void CompileItem_Click(object sender, RoutedEventArgs e)
         {
             LaTex laTex = new LaTex();
             book.SetChapters(sortedChapters);
             laTex.CompileBook(book);
         }
+        /*
+         * Method Name: OpenRefItem_Click
+         * Method Description: Triggered by Help-->Reference this method opens a LayTex reference Document
+         */
         private void OpenRefItem_Click(object sender, RoutedEventArgs e)
         {
             string link = "http://www.icl.utk.edu/~mgates3/docs/latex.pdf";
             Process.Start(link);
         }
+        /*
+         * Method Name: UpdateItem_Click
+         * Method Description: Triggered by Git-->Update this method calls the file UpdateFiles.bat as a process.
+         */
         private void UpdateItem_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                Process.Start("UpdateFiles.bat");
+                Process.Start("../UpdateFiles.bat");
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
             }
         }
+
         private void AddFigure_Click(object sender, RoutedEventArgs e)
         {
             //Button btn = (Button)sender;
@@ -211,29 +250,32 @@ namespace LayTexFileCreator
             string name = "";
             popup = new Window
             {
-                Width = 300,
-                Height = 130,
-                Background = Brushes.LightGray
+                Width = 500,
+                Height = 160,
+                Background = config.BACKGROUND_COLOR,
+                FontSize = 14
             };
 
             popupTitle.Content = "Page Title";
             popupTitle.HorizontalAlignment = HorizontalAlignment.Center;
-            popupTitle.Margin = new Thickness(-20, 5, 0, 0);
+            popupTitle.Margin = new Thickness(-20, 10, 0, 0);
             popupTextbox.Text = "";
             popupTextbox.Width = popup.Width - 35;
             popupTextbox.HorizontalAlignment = HorizontalAlignment.Center;
-            popupTextbox.Margin = new Thickness(-20, 5, 0, 0);
-            saveButton.Width = 50;
-            saveButton.Height = 25;
+            popupTextbox.Margin = new Thickness(-20, 10, 0, 0);
+            popupTextbox.Foreground = Brushes.White;
+            popupTextbox.FontSize = 14;
+            saveButton.Width = 120;
+            saveButton.Height = config.BUTTON_HEIGHT;
             saveButton.Content = "Save";
             saveButton.HorizontalAlignment = HorizontalAlignment.Left;
-            saveButton.Margin = new Thickness(8, 5, 0, 0);
+            saveButton.Margin = new Thickness(8, 10, 0, 0);
             saveButton.Click += SaveElements_Click;
-            cancelButton.Width = 50;
-            cancelButton.Height = 25;
+            cancelButton.Width = 120;
+            cancelButton.Height = config.BUTTON_HEIGHT;
             cancelButton.Content = "Cancel";
             cancelButton.HorizontalAlignment = HorizontalAlignment.Right;
-            cancelButton.Margin = new Thickness(0, 5, 27, 0);
+            cancelButton.Margin = new Thickness(0, 10, 27, 0);
             cancelButton.Click += CancelPopup_Click;
 
 
@@ -285,29 +327,32 @@ namespace LayTexFileCreator
             string name = "";
             popup = new Window
             {
-                Width = 300,
-                Height = 130,
-                Background = Brushes.LightGray
+                Width = 500,
+                Height = 160,
+                Background = config.BACKGROUND_COLOR,
+                FontSize = 14
             };
 
             popupTitle.Content = "Page Title";
             popupTitle.HorizontalAlignment = HorizontalAlignment.Center;
-            popupTitle.Margin = new Thickness(-20, 5, 0, 0);
+            popupTitle.Margin = new Thickness(-20, 10, 0, 0);
             popupTextbox.Text = "";
             popupTextbox.Width = popup.Width - 35;
             popupTextbox.HorizontalAlignment = HorizontalAlignment.Center;
-            popupTextbox.Margin = new Thickness(-20, 5, 0, 0);
-            saveButton.Width = 50;
-            saveButton.Height = 25;
+            popupTextbox.Margin = new Thickness(-20, 10, 0, 0);
+            popupTextbox.Foreground = Brushes.White;
+            popupTextbox.FontSize = 14;
+            saveButton.Width = 120;
+            saveButton.Height = config.BUTTON_HEIGHT;
             saveButton.Content = "Save";
             saveButton.HorizontalAlignment = HorizontalAlignment.Left;
-            saveButton.Margin = new Thickness(8, 5, 0, 0);
+            saveButton.Margin = new Thickness(8, 10, 0, 0);
             saveButton.Click += SaveElements_Click;
-            cancelButton.Width = 50;
-            cancelButton.Height = 25;
+            cancelButton.Width = 120;
+            cancelButton.Height = config.BUTTON_HEIGHT;
             cancelButton.Content = "Cancel";
             cancelButton.HorizontalAlignment = HorizontalAlignment.Right;
-            cancelButton.Margin = new Thickness(0, 5, 27, 0);
+            cancelButton.Margin = new Thickness(0, 10, 27, 0);
             cancelButton.Click += CancelPopup_Click;
 
 
@@ -373,7 +418,7 @@ namespace LayTexFileCreator
         }
         private void InitlizeBeforeListBox()
         {
-            Button last;
+            Button last = new Button();
             int tmpId = 0;
             lSBtn = new List<Button>();
             foreach (Element el in elements)
@@ -383,8 +428,10 @@ namespace LayTexFileCreator
                 {
                     Content = "(" + el.GetElementType() + ") " + el.GetTitle(),
                     Tag = tmpId,
-                    Width = sVBefore.Width - 20,
-                    Height = 25
+                    FontSize = config.FONT_SIZE,
+                    Width = 600,
+                    Height = 30,
+                    HorizontalAlignment = HorizontalAlignment.Center
                 };
                 last.Click += SetBeforeSelection_Click;
                 lSBtn.Add(last);
@@ -397,9 +444,9 @@ namespace LayTexFileCreator
             Button btn = (Button)sender;
             foreach (Button b in lSBtn)
             {
-                b.Background = Brushes.White;
+                b.Background = config.GUI_COLOR;
             }
-            lSBtn[int.Parse(btn.Tag.ToString())].Background = config.ACCENT_COLOR;
+            lSBtn[int.Parse(btn.Tag.ToString())].Background = Brushes.DimGray;
             lSBtnBefore = int.Parse(btn.Tag.ToString());
         }
         private void CancelPopup_Click(object sender, RoutedEventArgs e)
@@ -446,20 +493,26 @@ namespace LayTexFileCreator
         }
         private void OpenItem_Click(object sender, RoutedEventArgs e)
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            if (openFileDialog.ShowDialog() == true)
+            try
             {
-                System.Xml.Serialization.XmlSerializer reader = new System.Xml.Serialization.XmlSerializer(typeof(Page));
-                System.IO.StreamReader file = new System.IO.StreamReader(openFileDialog.FileName);
-                page = (Page)reader.Deserialize(file);
-                file.Close();
-                elements = page.GetElements();
-                UpdateElementList();
-                InitlizeParagraph("-1");
-                title.Text = "";
-                body.Text = "";
+                OpenFileDialog openFileDialog = new OpenFileDialog();
+                if (openFileDialog.ShowDialog() == true)
+                {
+                    System.Xml.Serialization.XmlSerializer reader = new System.Xml.Serialization.XmlSerializer(typeof(Page));
+                    System.IO.StreamReader file = new System.IO.StreamReader(openFileDialog.FileName);
+                    page = (Page)reader.Deserialize(file);
+                    file.Close();
+                    elements = page.GetElements();
+                    UpdateElementList();
+                    InitlizeParagraph("-1");
+                    title.Text = "";
+                    body.Text = "";
 
-                //File.ReadAllLines(openFileDialog.FileName);
+                    //File.ReadAllLines(openFileDialog.FileName);
+                }
+            }catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
             }
             //       txtEditor.Text = File.ReadAllText(openFileDialog.FileName);
         }
@@ -470,75 +523,89 @@ namespace LayTexFileCreator
         private void OpenBookMode_Click(object sender, RoutedEventArgs e)
         {
             // First open new page
-            Window subWindowBook = new Window();
-            subWindowBook.Show();
-            subWindowBook.Height = 500;
-            subWindowBook.Width = 800;
-            subWindowBook.Title = "Book_Mode";
+            Window subWindow = new Window();
+            subWindow.Show();
+            subWindow.Height = 766;
+            subWindow.Width = 1366;
+            subWindow.Title = "Book Mode";
+            subWindow.ResizeMode = ResizeMode.CanMinimize;
             // Draw GroupBox and Grid
             Grid grid = new Grid(), gridMain = new Grid(), controlsGrid = new Grid();
-            GroupBox groupBoxMain = new GroupBox();
-            groupBoxMain.Width = subWindowBook.Width - 40;
-            groupBoxMain.Height = subWindowBook.Height - 70;
-            groupBoxMain.VerticalAlignment = VerticalAlignment.Center;
-            groupBoxMain.HorizontalAlignment = HorizontalAlignment.Center;
-            groupBoxMain.Header = "Book Order Selector";
-            groupBoxMain.Margin = new Thickness(5);
-            GroupBox groupBoxBefore = new GroupBox();
-            groupBoxBefore.Width = subWindowBook.Width / 2 - 40;
-            groupBoxBefore.Height = subWindowBook.Height - 160;
-            groupBoxBefore.VerticalAlignment = VerticalAlignment.Center;
-            groupBoxBefore.HorizontalAlignment = HorizontalAlignment.Left;
-            groupBoxBefore.Header = "Non-Sorted View";
-            groupBoxBefore.Margin = new Thickness(5);
-            GroupBox groupBoxAfter = new GroupBox();
-            groupBoxAfter.Width = subWindowBook.Width / 2 - 40;
-            groupBoxAfter.Height = subWindowBook.Height - 160;
-            groupBoxAfter.VerticalAlignment = VerticalAlignment.Center;
-            groupBoxAfter.HorizontalAlignment = HorizontalAlignment.Right;
-            groupBoxAfter.Header = "Sorted View";
-            groupBoxAfter.Margin = new Thickness(5);
-            GroupBox groupBoxControls = new GroupBox();
-            groupBoxControls.Width = subWindowBook.Width - 60;
-            groupBoxControls.Height = 55;
-            groupBoxControls.VerticalAlignment = VerticalAlignment.Center;
-            groupBoxControls.HorizontalAlignment = HorizontalAlignment.Center;
-            groupBoxControls.Header = "Order Controls";
-            groupBoxControls.Margin = new Thickness(5, 5, 5, 0);
 
-            grid.Width = groupBoxMain.Width - 10;
-            grid.Height = groupBoxMain.Height - 10;
+            GroupBox groupBoxBefore = new GroupBox
+            {
+                Width = subWindow.Width / 2 - 25,
+                Height = subWindow.Height - 190,
+                VerticalAlignment = VerticalAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                Header = "Non-Sorted View",
+                Margin = new Thickness(10),
+                FontSize = 14,
+                BorderThickness = new Thickness(1),
+                BorderBrush = Brushes.Red
+            };
+            GroupBox groupBoxAfter = new GroupBox
+            {
+                Width = subWindow.Width / 2 - 25,
+                Height = subWindow.Height - 190,
+                VerticalAlignment = VerticalAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Right,
+                Header = "Sorted View",
+                Margin = new Thickness(10),
+                FontSize = 14,
+                BorderThickness = new Thickness(1),
+                BorderBrush = Brushes.Red
+            };
+            GroupBox groupBoxControls = new GroupBox
+            {
+                Width = subWindow.Width - 40,
+                Height = 80,
+                VerticalAlignment = VerticalAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                Header = "Order Controls",
+                FontSize = 14,
+                BorderThickness = new Thickness(1),
+                BorderBrush = Brushes.Red,
+               
+            };
+
+            grid.Width = subWindow.Width - 10;
+            grid.Height = subWindow.Height - 10;
             grid.VerticalAlignment = VerticalAlignment.Center;
             grid.HorizontalAlignment = HorizontalAlignment.Center;
+            grid.Background = config.BACKGROUND_COLOR;
+            
 
             controlsGrid.Width = groupBoxControls.Width - 10;
             controlsGrid.Height = groupBoxControls.Height - 10;
             controlsGrid.VerticalAlignment = VerticalAlignment.Center;
             controlsGrid.HorizontalAlignment = HorizontalAlignment.Center;
+            controlsGrid.Background = config.BACKGROUND_COLOR;
 
-            gridMain.Width = subWindowBook.Width;
-            gridMain.Height = subWindowBook.Height;
+            gridMain.Width = subWindow.Width;
+            gridMain.Height = subWindow.Height;
             gridMain.VerticalAlignment = VerticalAlignment.Center;
             gridMain.HorizontalAlignment = HorizontalAlignment.Center;
+            gridMain.Background = config.BACKGROUND_COLOR;
 
             // Add selector controls
             sVBeforeBook = new ListBox
             {
                 Height = groupBoxAfter.Height - 30,
-                Width = subWindowBook.Width / 2 - 60,
+                Width = subWindow.Width / 2 - 40,
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center,
-                Background = Brushes.AntiqueWhite,
-                Margin = new Thickness(1)
+               // Background = config.CONTROL_COLOR,
+                Margin = new Thickness(1),
             };
             sVAfterBook = new ListBox
             {
                 Height = groupBoxAfter.Height - 30,
-                Width = subWindowBook.Width / 2 - 60,
+                Width = subWindow.Width / 2 - 40,
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center,
-                Background = Brushes.AntiqueWhite,
-                Margin = new Thickness(1)
+                ///Background = config.CONTROL_COLOR,
+                Margin = new Thickness(1),
             };
 
             Menu menu = new Menu
@@ -556,7 +623,7 @@ namespace LayTexFileCreator
             saveMenuItem.Click += SaveItemSortedBook_Click;
             MenuItem loadMenuItem = new MenuItem
             {
-                Header = " Load"
+                Header = " Open"
             };
             loadMenuItem.Click += OpenItemSortedBook_Click;
             MenuItem compile = new MenuItem
@@ -591,10 +658,8 @@ namespace LayTexFileCreator
 
             Grid.SetRow(menu, 0);
             gridMain.Children.Add(menu);
-            Grid.SetRow(groupBoxMain, 1);
-            gridMain.Children.Add(groupBoxMain);
-
-            groupBoxMain.Content = grid;
+            Grid.SetRow(grid, 1);
+            gridMain.Children.Add(grid);
 
             row = new RowDefinition
             {
@@ -655,47 +720,47 @@ namespace LayTexFileCreator
             addAllBookBtn = new Button();
 
             //Sorted view
-            moveUpBtnBook.Width = 75;
-            moveUpBtnBook.Height = 25;
+            moveUpBtnBook.Width = 120;
+            moveUpBtnBook.Height = config.BUTTON_HEIGHT;
             moveUpBtnBook.Content = "Move Up";
             moveUpBtnBook.Click += MoveUpBook_Click;
             moveUpBtnBook.HorizontalAlignment = HorizontalAlignment.Center;
-            moveUpBtnBook.Margin = new Thickness(10, 2, 10, 0);
+            moveUpBtnBook.Margin = new Thickness(10, -5, 10, -5);
 
-            moveDownBtnBook.Width = 75;
-            moveDownBtnBook.Height = 25;
+            moveDownBtnBook.Width = 120;
+            moveDownBtnBook.Height = config.BUTTON_HEIGHT;
             moveDownBtnBook.Content = "Move Down";
             moveDownBtnBook.Click += MoveDownBook_Click;
             moveDownBtnBook.HorizontalAlignment = HorizontalAlignment.Center;
-            moveDownBtnBook.Margin = new Thickness(10, 2, 90, 0);
+            moveDownBtnBook.Margin = new Thickness(10, -5, 130, -5);
 
-            removeBookBtn.Width = 75;
-            removeBookBtn.Height = 25;
+            removeBookBtn.Width = 120;
+            removeBookBtn.Height = config.BUTTON_HEIGHT;
             removeBookBtn.Content = "Remove One";
             removeBookBtn.Click += RemoveBook_Click;
             removeBookBtn.HorizontalAlignment = HorizontalAlignment.Center;
-            removeBookBtn.Margin = new Thickness(10, 2, 10, 0);
+            removeBookBtn.Margin = new Thickness(130, -5, 10, -5);
 
-            removeAllBookBtn.Width = 75;
-            removeAllBookBtn.Height = 25;
+            removeAllBookBtn.Width = 120;
+            removeAllBookBtn.Height = config.BUTTON_HEIGHT;
             removeAllBookBtn.Content = "Remove All";
             removeAllBookBtn.Click += RemoveAllBook_Click;
             removeAllBookBtn.HorizontalAlignment = HorizontalAlignment.Center;
-            removeAllBookBtn.Margin = new Thickness(10, 2, 10, 0);
+            removeAllBookBtn.Margin = new Thickness(10, -5, 130, -5);
 
-            addSelectedBook.Width = 75;
-            addSelectedBook.Height = 25;
+            addSelectedBook.Width = 120;
+            addSelectedBook.Height = config.BUTTON_HEIGHT;
             addSelectedBook.Content = "Add One";
             addSelectedBook.Click += AddBook_Click;
             addSelectedBook.HorizontalAlignment = HorizontalAlignment.Center;
-            addSelectedBook.Margin = new Thickness(90, 2, 10, 0);
+            addSelectedBook.Margin = new Thickness(125, -5, 10, -5);
 
-            addAllBookBtn.Width = 75;
-            addAllBookBtn.Height = 25;
+            addAllBookBtn.Width = 120;
+            addAllBookBtn.Height = config.BUTTON_HEIGHT;
             addAllBookBtn.Content = "Add All";
             addAllBookBtn.Click += AddAllBook_Click;
             addAllBookBtn.HorizontalAlignment = HorizontalAlignment.Center;
-            addAllBookBtn.Margin = new Thickness(10, 2, 10, 0);
+            addAllBookBtn.Margin = new Thickness(10, -5, 10, -5);
 
             Grid.SetColumn(moveUpBtnBook, 0);
             controlsGrid.Children.Add(moveUpBtnBook);
@@ -713,12 +778,12 @@ namespace LayTexFileCreator
             groupBoxControls.Content = controlsGrid;
             groupBoxBefore.Content = sVBeforeBook;
             groupBoxAfter.Content = sVAfterBook;
-            subWindowBook.Content = gridMain;
+            subWindow.Content = gridMain;
         }
         private void OpenItemSortedBook_Click(object sender, RoutedEventArgs e)
         {
             CommonOpenFileDialog dialog = new CommonOpenFileDialog();
-            dialog.InitialDirectory = config.DEFAULT_DIRECTORY_LOCATION = "\\PreCompile\\ChapterBackups";
+            dialog.InitialDirectory = config.DEFAULT_DIRECTORY_LOCATION + "\\PreCompile\\ChapterBackups";
             dialog.IsFolderPicker = true;
             chapters.Clear();
             List<string> files = new List<string>();
@@ -748,8 +813,10 @@ namespace LayTexFileCreator
                 {
                     Content = chapter.GetChapterName(),
                     Tag = tmpId,
-                    Width = sVBeforeBook.Width - 20,
-                    Height = 25
+                    FontSize = config.FONT_SIZE,
+                    Width = 600,
+                    Height = 30,
+                    HorizontalAlignment = HorizontalAlignment.Center
                 };
                 //pages.Add(page);
 
@@ -764,9 +831,9 @@ namespace LayTexFileCreator
             Button btn = (Button)sender;
             foreach (Button b in lSBtnBook)
             {
-                b.Background = Brushes.White;
+                b.Background = config.GUI_COLOR;
             }
-            lSBtnBook[int.Parse(btn.Tag.ToString())].Background = config.ACCENT_COLOR;
+            lSBtnBook[int.Parse(btn.Tag.ToString())].Background = Brushes.DimGray;
             lSBtnBeforeBook = int.Parse(btn.Tag.ToString()); ;
         }
         private void SaveItemSortedChapter_Click(object sender, RoutedEventArgs e)
@@ -780,29 +847,32 @@ namespace LayTexFileCreator
             string name = "";
             popup = new Window
             {
-                Width = 300,
-                Height = 130,
-                Background = Brushes.LightGray
+                Width = 500,
+                Height = 160,
+                Background = config.BACKGROUND_COLOR,
+                FontSize = 14
             };
 
             popupTitle.Content = "Chapter Title";
             popupTitle.HorizontalAlignment = HorizontalAlignment.Center;
-            popupTitle.Margin = new Thickness(-20, 5, 0, 0);
+            popupTitle.Margin = new Thickness(-20, 10, 0, 0);
             popupTextbox.Text = "";
             popupTextbox.Width = popup.Width - 35;
             popupTextbox.HorizontalAlignment = HorizontalAlignment.Center;
-            popupTextbox.Margin = new Thickness(-20, 5, 0, 0);
-            saveButton.Width = 50;
-            saveButton.Height = 25;
+            popupTextbox.Margin = new Thickness(-20, 10, 0, 0);
+            popupTextbox.Foreground = Brushes.White;
+            popupTextbox.FontSize = 14;
+            saveButton.Width = 120;
+            saveButton.Height = config.BUTTON_HEIGHT;
             saveButton.Content = "Save";
             saveButton.HorizontalAlignment = HorizontalAlignment.Left;
-            saveButton.Margin = new Thickness(8, 5, 0, 0);
+            saveButton.Margin = new Thickness(8, 10, 0, 0);
             saveButton.Click += SaveChapter_Click;
-            cancelButton.Width = 50;
-            cancelButton.Height = 25;
+            cancelButton.Width = 120;
+            cancelButton.Height = config.BUTTON_HEIGHT;
             cancelButton.Content = "Cancel";
             cancelButton.HorizontalAlignment = HorizontalAlignment.Right;
-            cancelButton.Margin = new Thickness(0, 5, 27, 0);
+            cancelButton.Margin = new Thickness(0, 10, 27, 0);
             cancelButton.Click += CancelPopup_Click;
 
 
@@ -893,8 +963,10 @@ namespace LayTexFileCreator
                     {
                         Content = chapter.GetChapterName(),
                         Tag = tmpId,
-                        Width = sVBeforeBook.Width - 20,
-                        Height = 25
+                        FontSize = config.FONT_SIZE,
+                        Width = 600,
+                        Height = 30,
+                        HorizontalAlignment = HorizontalAlignment.Center
                     };
                     last.Click += SetAfterSelectionBook_Click;
                     lSBtnSortedBook.Add(last);
@@ -933,8 +1005,10 @@ namespace LayTexFileCreator
                     {
                         Content = chapter.GetChapterName(),
                         Tag = tmpId,
-                        Width = sVBeforeBook.Width - 20,
-                        Height = 25
+                        FontSize = config.FONT_SIZE,
+                        Width = 600,
+                        Height = 30,
+                        HorizontalAlignment = HorizontalAlignment.Center
                     };
                     last.Click += SetAfterSelectionBook_Click;
                     lSBtnSortedBook.Add(last);
@@ -980,8 +1054,10 @@ namespace LayTexFileCreator
                 {
                     Content = chapters[lSBtnBeforeBook].GetChapterName(),
                     Tag = lSBtnSortedBook.Count(),
-                    Width = sVBeforeBook.Width - 20,
-                    Height = 25
+                    FontSize = config.FONT_SIZE,
+                    Width = 600,
+                    Height = 30,
+                    HorizontalAlignment = HorizontalAlignment.Center
                 };
                 sortedChapters.Add(chapters[lSBtnBeforeBook]);
                 last.Click += SetAfterSelectionBook_Click;
@@ -1006,8 +1082,10 @@ namespace LayTexFileCreator
                 {
                     Content = chapter.GetChapterName(),
                     Tag = tmpId,
-                    Width = sVBeforeBook.Width - 20,
-                    Height = 25
+                    FontSize = config.FONT_SIZE,
+                    Width = 600,
+                    Height = 30,
+                    HorizontalAlignment = HorizontalAlignment.Center
                 };
                 sortedChapters.Add(chapter);
 
@@ -1022,83 +1100,95 @@ namespace LayTexFileCreator
             Button btn = (Button)sender;
             foreach (Button b in lSBtnSortedBook)
             {
-                b.Background = Brushes.White;
+                b.Background = config.GUI_COLOR;
             }
-            lSBtnSortedBook[int.Parse(btn.Tag.ToString())].Background = config.ACCENT_COLOR;
+            lSBtnSortedBook[int.Parse(btn.Tag.ToString())].Background = Brushes.DimGray;
             lSBtnAfterBook = int.Parse(btn.Tag.ToString());
         }
         private void OpenChapterMode_Click(object sender, RoutedEventArgs e)
         {
             // First open new page
-            Window subWindowChapter = new Window();
-            subWindowChapter.Show();
-            subWindowChapter.Height = 500;
-            subWindowChapter.Width = 800;
-            subWindowChapter.Title = "Chapter_Mode";
+            Window subWindow = new Window();
+            subWindow.Show();
+            subWindow.Height = 766;
+            subWindow.Width = 1366;
+            subWindow.Title = "Chapter Mode";
+            subWindow.ResizeMode = ResizeMode.CanMinimize;
             // Draw GroupBox and Grid
             Grid grid = new Grid(), gridMain = new Grid(), controlsGrid = new Grid();
-            GroupBox groupBoxMain = new GroupBox();
-            groupBoxMain.Width = subWindowChapter.Width - 40;
-            groupBoxMain.Height = subWindowChapter.Height - 70;
-            groupBoxMain.VerticalAlignment = VerticalAlignment.Center;
-            groupBoxMain.HorizontalAlignment = HorizontalAlignment.Center;
-            groupBoxMain.Header = "Chapter Order Selector";
-            groupBoxMain.Margin = new Thickness(5);
-            GroupBox groupBoxBefore = new GroupBox();
-            groupBoxBefore.Width = subWindowChapter.Width / 2 - 40;
-            groupBoxBefore.Height = subWindowChapter.Height - 160;
-            groupBoxBefore.VerticalAlignment = VerticalAlignment.Center;
-            groupBoxBefore.HorizontalAlignment = HorizontalAlignment.Left;
-            groupBoxBefore.Header = "Non-Sorted View";
-            groupBoxBefore.Margin = new Thickness(5);
-            GroupBox groupBoxAfter = new GroupBox();
-            groupBoxAfter.Width = subWindowChapter.Width / 2 - 40;
-            groupBoxAfter.Height = subWindowChapter.Height - 160;
-            groupBoxAfter.VerticalAlignment = VerticalAlignment.Center;
-            groupBoxAfter.HorizontalAlignment = HorizontalAlignment.Right;
-            groupBoxAfter.Header = "Sorted View";
-            groupBoxAfter.Margin = new Thickness(5);
-            GroupBox groupBoxControls = new GroupBox();
-            groupBoxControls.Width = subWindowChapter.Width - 60;
-            groupBoxControls.Height = 55;
-            groupBoxControls.VerticalAlignment = VerticalAlignment.Center;
-            groupBoxControls.HorizontalAlignment = HorizontalAlignment.Center;
-            groupBoxControls.Header = "Order Controls";
-            groupBoxControls.Margin = new Thickness(5, 5, 5, 0);
 
-            grid.Width = groupBoxMain.Width - 10;
-            grid.Height = groupBoxMain.Height - 10;
+            GroupBox groupBoxBefore = new GroupBox
+            {
+                Width = subWindow.Width / 2 - 25,
+                Height = subWindow.Height - 190,
+                VerticalAlignment = VerticalAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                Header = "Non-Sorted View",
+                Margin = new Thickness(10),
+                FontSize = 14,
+                BorderThickness = new Thickness(1),
+                BorderBrush = Brushes.Red
+            };
+            GroupBox groupBoxAfter = new GroupBox
+            {
+                Width = subWindow.Width / 2 - 25,
+                Height = subWindow.Height - 190,
+                VerticalAlignment = VerticalAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Right,
+                Header = "Sorted View",
+                FontSize = 14,
+                BorderThickness = new Thickness(1),
+                Margin = new Thickness(10),
+                BorderBrush = Brushes.Red
+            };
+            GroupBox groupBoxControls = new GroupBox
+            {
+                Width = subWindow.Width - 40,
+                Height = 80,
+                VerticalAlignment = VerticalAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                Header = "Order Controls",
+                FontSize = 14,
+                BorderThickness = new Thickness(1),
+                BorderBrush = Brushes.Red
+            };
+
+            grid.Width = subWindow.Width - 10;
+            grid.Height = subWindow.Height - 10;
             grid.VerticalAlignment = VerticalAlignment.Center;
             grid.HorizontalAlignment = HorizontalAlignment.Center;
+            grid.Background = config.BACKGROUND_COLOR;
 
             controlsGrid.Width = groupBoxControls.Width - 10;
             controlsGrid.Height = groupBoxControls.Height - 10;
             controlsGrid.VerticalAlignment = VerticalAlignment.Center;
             controlsGrid.HorizontalAlignment = HorizontalAlignment.Center;
+            controlsGrid.Background = config.BACKGROUND_COLOR;
 
-            gridMain.Width = subWindowChapter.Width;
-            gridMain.Height = subWindowChapter.Height;
+            gridMain.Width = subWindow.Width;
+            gridMain.Height = subWindow.Height;
             gridMain.VerticalAlignment = VerticalAlignment.Center;
             gridMain.HorizontalAlignment = HorizontalAlignment.Center;
+            gridMain.Background = config.BACKGROUND_COLOR;
 
             // Add selector controls
             sVBeforeChapter = new ListBox
             {
-                Height = groupBoxAfter.Height - 30,
-                Width = subWindowChapter.Width / 2 - 60,
+                Height = groupBoxAfter.Height - 50,
+                Width = subWindow.Width / 2 - 40,
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center,
-                Background = Brushes.AntiqueWhite,
-                Margin = new Thickness(1)
+               // Background = config.CONTROL_COLOR,
+                Margin = new Thickness(1),
             };
             sVAfterChapter = new ListBox
             {
-                Height = groupBoxAfter.Height - 30,
-                Width = subWindowChapter.Width / 2 - 60,
+                Height = groupBoxAfter.Height - 50,
+                Width = subWindow.Width / 2 - 40,
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center,
-                Background = Brushes.AntiqueWhite,
-                Margin = new Thickness(1)
+                //Background = config.CONTROL_COLOR,
+                Margin = new Thickness(1),
             };
 
             Menu menu = new Menu
@@ -1116,7 +1206,7 @@ namespace LayTexFileCreator
             saveMenuItem.Click += SaveItemSortedChapter_Click;
             MenuItem loadMenuItem = new MenuItem
             {
-                Header = " Load"
+                Header = " Open"
             };
             loadMenuItem.Click += OpenItemSortedChapter_Click;
 
@@ -1141,10 +1231,9 @@ namespace LayTexFileCreator
 
             Grid.SetRow(menu, 0);
             gridMain.Children.Add(menu);
-            Grid.SetRow(groupBoxMain, 1);
-            gridMain.Children.Add(groupBoxMain);
+            Grid.SetRow(grid, 1);
+            gridMain.Children.Add(grid);
 
-            groupBoxMain.Content = grid;
 
             row = new RowDefinition
             {
@@ -1205,47 +1294,47 @@ namespace LayTexFileCreator
             addAllChapterBtn = new Button();
 
             //Sorted view
-            moveUpBtnChapter.Width = 75;
-            moveUpBtnChapter.Height = 25;
+            moveUpBtnChapter.Width = 120;
+            moveUpBtnChapter.Height = config.BUTTON_HEIGHT;
             moveUpBtnChapter.Content = "Move Up";
             moveUpBtnChapter.Click += MoveUpChapter_Click;
             moveUpBtnChapter.HorizontalAlignment = HorizontalAlignment.Center;
-            moveUpBtnChapter.Margin = new Thickness(10, 2, 10, 0);
+            moveUpBtnChapter.Margin = new Thickness(10, -5, 10, -5);
 
-            moveDownBtnChapter.Width = 75;
-            moveDownBtnChapter.Height = 25;
+            moveDownBtnChapter.Width = 120;
+            moveDownBtnChapter.Height = config.BUTTON_HEIGHT;
             moveDownBtnChapter.Content = "Move Down";
             moveDownBtnChapter.Click += MoveDownChapter_Click;
             moveDownBtnChapter.HorizontalAlignment = HorizontalAlignment.Center;
-            moveDownBtnChapter.Margin = new Thickness(10, 2, 90, 0);
+            moveDownBtnChapter.Margin = new Thickness(10, -5, 130, -5);
 
-            removeChapterBtn.Width = 75;
-            removeChapterBtn.Height = 25;
+            removeChapterBtn.Width = 120;
+            removeChapterBtn.Height = config.BUTTON_HEIGHT;
             removeChapterBtn.Content = "Remove One";
             removeChapterBtn.Click += RemoveChapter_Click;
             removeChapterBtn.HorizontalAlignment = HorizontalAlignment.Center;
-            removeChapterBtn.Margin = new Thickness(10, 2, 10, 0);
+            removeChapterBtn.Margin = new Thickness(130, -5, 10, -5);
 
-            removeAllChapterBtn.Width = 75;
-            removeAllChapterBtn.Height = 25;
+            removeAllChapterBtn.Width = 120;
+            removeAllChapterBtn.Height = config.BUTTON_HEIGHT;
             removeAllChapterBtn.Content = "Remove All";
             removeAllChapterBtn.Click += RemoveAllChapter_Click;
             removeAllChapterBtn.HorizontalAlignment = HorizontalAlignment.Center;
-            removeAllChapterBtn.Margin = new Thickness(10, 2, 10, 0);
+            removeAllChapterBtn.Margin = new Thickness(10, -5, 130, -5);
 
-            addSelectedChapter.Width = 75;
-            addSelectedChapter.Height = 25;
+            addSelectedChapter.Width = 120;
+            addSelectedChapter.Height = config.BUTTON_HEIGHT;
             addSelectedChapter.Content = "Add One";
             addSelectedChapter.Click += AddChapter_Click;
             addSelectedChapter.HorizontalAlignment = HorizontalAlignment.Center;
-            addSelectedChapter.Margin = new Thickness(90, 2, 10, 0);
+            addSelectedChapter.Margin = new Thickness(125, -5, 10, -5);
 
-            addAllChapterBtn.Width = 75;
-            addAllChapterBtn.Height = 25;
+            addAllChapterBtn.Width = 120;
+            addAllChapterBtn.Height = config.BUTTON_HEIGHT;
             addAllChapterBtn.Content = "Add All";
             addAllChapterBtn.Click += AddAllChapter_Click;
             addAllChapterBtn.HorizontalAlignment = HorizontalAlignment.Center;
-            addAllChapterBtn.Margin = new Thickness(10, 2, 10, 0);
+            addAllChapterBtn.Margin = new Thickness(10, -5, 10, -5);
 
             Grid.SetColumn(moveUpBtnChapter, 0);
             controlsGrid.Children.Add(moveUpBtnChapter);
@@ -1263,7 +1352,7 @@ namespace LayTexFileCreator
             groupBoxControls.Content = controlsGrid;
             groupBoxBefore.Content = sVBeforeChapter;
             groupBoxAfter.Content = sVAfterChapter;
-            subWindowChapter.Content = gridMain;
+            subWindow.Content = gridMain;
         }
         private void MoveUpChapter_Click(object sender, RoutedEventArgs e)
         {
@@ -1280,8 +1369,10 @@ namespace LayTexFileCreator
                     {
                         Content = page.Getname(),
                         Tag = tmpId,
-                        Width = sVBeforeChapter.Width - 20,
-                        Height = 25
+                        FontSize = config.FONT_SIZE,
+                        Width = 600,
+                        Height = 30,
+                        HorizontalAlignment = HorizontalAlignment.Center
                     };
                     last.Click += SetAfterSelectionChapter_Click;
                     lSBtnSortedChapter.Add(last);
@@ -1305,8 +1396,10 @@ namespace LayTexFileCreator
                     {
                         Content = page.Getname(),
                         Tag = tmpId,
-                        Width = sVBeforeChapter.Width - 20,
-                        Height = 25
+                        FontSize = config.FONT_SIZE,
+                        Width = 600,
+                        Height = 30,
+                        HorizontalAlignment = HorizontalAlignment.Center
                     };
                     last.Click += SetAfterSelectionChapter_Click;
                     lSBtnSortedChapter.Add(last);
@@ -1351,8 +1444,10 @@ namespace LayTexFileCreator
                 {
                     Content = pages[lSBtnBeforeChapter].Getname(),
                     Tag = lSBtnSortedBook.Count(),
-                    Width = sVBeforeChapter.Width - 20,
-                    Height = 25
+                    FontSize = config.FONT_SIZE,
+                    Width = 600,
+                    Height = 30,
+                    HorizontalAlignment = HorizontalAlignment.Center
                 };
                 sortedPages.Add(pages[lSBtnBeforeChapter]);
                 last.Click += SetAfterSelectionBook_Click;
@@ -1377,8 +1472,10 @@ namespace LayTexFileCreator
                 {
                     Content = page.Getname(),
                     Tag = tmpId,
-                    Width = sVBeforeChapter.Width - 20,
-                    Height = 25
+                    FontSize = config.FONT_SIZE,
+                    Width = 600,
+                    Height = 30,
+                    HorizontalAlignment = HorizontalAlignment.Center
                 };
                 sortedPages.Add(page);
 
@@ -1393,9 +1490,9 @@ namespace LayTexFileCreator
             Button btn = (Button)sender;
             foreach (Button b in lSBtnSortedChapter)
             {
-                b.Background = Brushes.White;
+                b.Background = config.GUI_COLOR;
             }
-            lSBtnSortedChapter[int.Parse(btn.Tag.ToString())].Background = config.ACCENT_COLOR;
+            lSBtnSortedChapter[int.Parse(btn.Tag.ToString())].Background = Brushes.DimGray;
             lSBtnAfterChapter = int.Parse(btn.Tag.ToString());
         }
         private void SaveItemSortedBook_Click(object sender, RoutedEventArgs e)
@@ -1406,32 +1503,37 @@ namespace LayTexFileCreator
             //}
             //chapter.SetDateEdited(DateTime.Now.ToString("yyyy:MM:dd:h:mm:ss tt"));
             //chapter.SetPages(sortedPages);
-            book.SetChapters(chapters);
-
-            SaveFileDialog saveFileDialog = new SaveFileDialog
+            try
             {
-                InitialDirectory = config.DEFAULT_DIRECTORY_LOCATION + config.DEFAULT_DIRECTORY_LOCATION,
-                Filter = "Xml file|*.xml",
-                Title = "Save a page data File",
-                FileName = DateTime.Now.ToString("yyyy_MM_dd_h_mm_ss_tt") + "_backup.xml"
-            };
+                book.SetChapters(chapters);
 
-            saveFileDialog.ShowDialog();
-            XmlDocument xmlDocument = new XmlDocument();
-            XmlSerializer serializer = new XmlSerializer(typeof(Page));
-            using (MemoryStream stream = new MemoryStream())
+                SaveFileDialog saveFileDialog = new SaveFileDialog
+                {
+                    InitialDirectory = config.DEFAULT_DIRECTORY_LOCATION + config.DEFAULT_DIRECTORY_LOCATION,
+                    Filter = "Xml file|*.xml",
+                    Title = "Save a page data File",
+                    FileName = DateTime.Now.ToString("yyyy_MM_dd_h_mm_ss_tt") + "_backup.xml"
+                };
+
+                saveFileDialog.ShowDialog();
+                XmlDocument xmlDocument = new XmlDocument();
+                XmlSerializer serializer = new XmlSerializer(typeof(Page));
+                using (MemoryStream stream = new MemoryStream())
+                {
+                    serializer.Serialize(stream, page);
+                    stream.Position = 0;
+                    xmlDocument.Load(stream);
+                    xmlDocument.Save(saveFileDialog.FileName);
+                }
+            }
+            catch(Exception ex)
             {
-                serializer.Serialize(stream, page);
-                stream.Position = 0;
-                xmlDocument.Load(stream);
-                xmlDocument.Save(saveFileDialog.FileName);
+                Console.WriteLine(ex.Message);
             }
         }
-
-
-
         private void OpenItemSortedChapter_Click(object sender, RoutedEventArgs e)
         {
+            try {
             CommonOpenFileDialog dialog = new CommonOpenFileDialog();
             dialog.InitialDirectory = config.DEFAULT_DIRECTORY_LOCATION ;
             dialog.IsFolderPicker = true;
@@ -1462,8 +1564,10 @@ namespace LayTexFileCreator
                 {
                     Content = page.Getname(),
                     Tag = tmpId,
-                    Width = sVBeforeChapter.Width - 20,
-                    Height = 25
+                    FontSize = config.FONT_SIZE,
+                    Width = 600,
+                    Height = 30,
+                    HorizontalAlignment = HorizontalAlignment.Center
                 };
                 //pages.Add(page);
 
@@ -1472,16 +1576,20 @@ namespace LayTexFileCreator
                 sVBeforeChapter.Items.Add(last);
                 tmpId++;
             }
-
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
         }
         private void SetBeforeSelectionChapter_Click(object sender, RoutedEventArgs e)
         {
             Button btn = (Button)sender;
             foreach (Button b in lSBtnChapter)
             {
-                b.Background = Brushes.White;
+                b.Background = config.GUI_COLOR;
             }
-            lSBtnChapter[int.Parse(btn.Tag.ToString())].Background = config.ACCENT_COLOR;
+            lSBtnChapter[int.Parse(btn.Tag.ToString())].Background = Brushes.DimGray;
             lSBtnBeforeChapter = int.Parse(btn.Tag.ToString());
         }
         private void OpenPageMode_Click(object sender, RoutedEventArgs e)
@@ -1489,77 +1597,93 @@ namespace LayTexFileCreator
             // First open new page
             Window subWindow = new Window();
             subWindow.Show();
-            subWindow.Height = 500;
-            subWindow.Width = 800;
-            subWindow.Title = "Page_Mode";
+            subWindow.Height = 766;
+            subWindow.Width = 1366;
+            subWindow.Title = "Page Mode";
+            subWindow.ResizeMode = ResizeMode.CanMinimize;
+           // subWindow.ResizeMode = ResizeMode.NoResize;
+
             // Draw GroupBox and Grid
             Grid grid = new Grid(), gridMain = new Grid(), controlsGrid = new Grid();
-            GroupBox groupBoxMain = new GroupBox();
-            groupBoxMain.Width = subWindow.Width - 40;
-            groupBoxMain.Height = subWindow.Height - 70;
-            groupBoxMain.VerticalAlignment = VerticalAlignment.Center;
-            groupBoxMain.HorizontalAlignment = HorizontalAlignment.Center;
-            groupBoxMain.Header = "Page Order Selector";
-            groupBoxMain.Margin = new Thickness(5);
-            GroupBox groupBoxBefore = new GroupBox();
-            groupBoxBefore.Width = subWindow.Width / 2 - 40;
-            groupBoxBefore.Height = subWindow.Height - 160;
-            groupBoxBefore.VerticalAlignment = VerticalAlignment.Center;
-            groupBoxBefore.HorizontalAlignment = HorizontalAlignment.Left;
-            groupBoxBefore.Header = "Non-Sorted View";
-            groupBoxBefore.Margin = new Thickness(5);
-            GroupBox groupBoxAfter = new GroupBox();
-            groupBoxAfter.Width = subWindow.Width / 2 - 40;
-            groupBoxAfter.Height = subWindow.Height - 160;
-            groupBoxAfter.VerticalAlignment = VerticalAlignment.Center;
-            groupBoxAfter.HorizontalAlignment = HorizontalAlignment.Right;
-            groupBoxAfter.Header = "Sorted View";
-            groupBoxAfter.Margin = new Thickness(5);
-            GroupBox groupBoxControls = new GroupBox();
-            groupBoxControls.Width = subWindow.Width - 60;
-            groupBoxControls.Height = 55;
-            groupBoxControls.VerticalAlignment = VerticalAlignment.Center;
-            groupBoxControls.HorizontalAlignment = HorizontalAlignment.Center;
-            groupBoxControls.Header = "Order Controls";
-            groupBoxControls.Margin = new Thickness(5, 5, 5, 0);
+
+            GroupBox groupBoxBefore = new GroupBox
+            {
+                Width = subWindow.Width / 2 - 25,
+                Height = subWindow.Height - 230,
+                VerticalAlignment = VerticalAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                Header = "Non-Sorted View",
+                Margin = new Thickness(10),
+                FontSize = 14,
+                BorderThickness = new Thickness(1),
+                BorderBrush = Brushes.Red
+            };
+            GroupBox groupBoxAfter = new GroupBox
+            {
+                Width = subWindow.Width / 2 - 25,
+                Height = subWindow.Height - 230,
+                VerticalAlignment = VerticalAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Right,
+                Header = "Sorted View",
+                FontSize = 14,
+                BorderThickness = new Thickness(1),
+                Margin = new Thickness(10),
+                BorderBrush = Brushes.Red
+            };
+            GroupBox groupBoxControls = new GroupBox
+            {
+                Width = subWindow.Width - 40,
+                Height = 80,
+                VerticalAlignment = VerticalAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                Header = "Order Controls",
+                FontSize = 14,
+                BorderThickness = new Thickness(1),
+                BorderBrush = Brushes.Red
+            };
             //groupBox.Background = Brushes.Blue;
             //groupBox.Margin = new Thickness(5);
             //groupBox.Content = grid;
 
 
-            grid.Width = groupBoxMain.Width - 10;
-            grid.Height = groupBoxMain.Height - 10;
+            grid.Width = subWindow.Width - 10;
+            grid.Height = subWindow.Height - 10;
             grid.VerticalAlignment = VerticalAlignment.Center;
             grid.HorizontalAlignment = HorizontalAlignment.Center;
+            grid.Background = config.BACKGROUND_COLOR;
 
             controlsGrid.Width = groupBoxControls.Width - 10;
             controlsGrid.Height = groupBoxControls.Height - 10;
             controlsGrid.VerticalAlignment = VerticalAlignment.Center;
             controlsGrid.HorizontalAlignment = HorizontalAlignment.Center;
+            controlsGrid.Background = config.BACKGROUND_COLOR;
 
             gridMain.Width = subWindow.Width;
             gridMain.Height = subWindow.Height;
             gridMain.VerticalAlignment = VerticalAlignment.Center;
             gridMain.HorizontalAlignment = HorizontalAlignment.Center;
+            gridMain.Background = config.BACKGROUND_COLOR;
+
             //grid.Margin = new Thickness(5);
             // Add selector controls
             sVBeforeChapter = new ListBox
             {
                 Height = groupBoxAfter.Height - 30,
-                Width = subWindow.Width / 2 - 60,
+                Width = subWindow.Width / 2 - 40,
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center,
-                Background = Brushes.AntiqueWhite,
-                Margin = new Thickness(1)
+                Background = config.CONTROL_COLOR,
+                Margin = new Thickness(1),
+
             };
             sVAfterChapter = new ListBox
             {
                 Height = groupBoxAfter.Height - 30,
-                Width = subWindow.Width / 2 - 60,
+                Width = subWindow.Width / 2 - 40,
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center,
-                Background = Brushes.AntiqueWhite,
-                Margin = new Thickness(1)
+                Background = config.CONTROL_COLOR,
+                Margin = new Thickness(1),
             };
 
             Menu menu = new Menu
@@ -1577,7 +1701,7 @@ namespace LayTexFileCreator
             saveMenuItem.Click += SaveItemSorted_Click;
             MenuItem loadMenuItem = new MenuItem
             {
-                Header = " Load"
+                Header = " Open"
             };
             loadMenuItem.Click += OpenItemSorted_Click;
 
@@ -1602,10 +1726,10 @@ namespace LayTexFileCreator
 
             Grid.SetRow(menu, 0);
             gridMain.Children.Add(menu);
-            Grid.SetRow(groupBoxMain, 1);
-            gridMain.Children.Add(groupBoxMain);
+            Grid.SetRow(grid, 1);
+            gridMain.Children.Add(grid);
 
-            groupBoxMain.Content = grid;
+            //groupBoxMain.Content = grid;
 
             row = new RowDefinition
             {
@@ -1657,6 +1781,7 @@ namespace LayTexFileCreator
                 Width = new GridLength(25, GridUnitType.Auto)
             };
             controlsGrid.ColumnDefinitions.Add(column);
+ 
 
             moveUpBtn = new Button();
             moveDownBtn = new Button();
@@ -1666,47 +1791,47 @@ namespace LayTexFileCreator
             addAllElementBtn = new Button();
 
             //Sorted view
-            moveUpBtn.Width = 75;
-            moveUpBtn.Height = 25;
+            moveUpBtn.Width = 120;
+            moveUpBtn.Height = config.BUTTON_HEIGHT;
             moveUpBtn.Content = "Move Up";
             moveUpBtn.Click += MoveElementUp_Click;
             moveUpBtn.HorizontalAlignment = HorizontalAlignment.Center;
-            moveUpBtn.Margin = new Thickness(10, 2, 10, 0);
+            moveUpBtn.Margin = new Thickness(10, -5, 10, -5);
 
-            moveDownBtn.Width = 75;
-            moveDownBtn.Height = 25;
+            moveDownBtn.Width = 120;
+            moveDownBtn.Height = config.BUTTON_HEIGHT;
             moveDownBtn.Content = "Move Down";
             moveDownBtn.Click += MoveElementDown_Click;
             moveDownBtn.HorizontalAlignment = HorizontalAlignment.Center;
-            moveDownBtn.Margin = new Thickness(10, 2, 90, 0);
+            moveDownBtn.Margin = new Thickness(10, -5, 130, -5);
 
-            removeElementBtn.Width = 75;
-            removeElementBtn.Height = 25;
+            removeElementBtn.Width = 120;
+            removeElementBtn.Height = config.BUTTON_HEIGHT;
             removeElementBtn.Content = "Remove One";
             removeElementBtn.Click += RemoveElement_Click;
             removeElementBtn.HorizontalAlignment = HorizontalAlignment.Center;
-            removeElementBtn.Margin = new Thickness(10, 2, 10, 0);
+            removeElementBtn.Margin = new Thickness(130, -5, 10, -5);
 
-            removeAllElementBtn.Width = 75;
-            removeAllElementBtn.Height = 25;
+            removeAllElementBtn.Width = 120;
+            removeAllElementBtn.Height = config.BUTTON_HEIGHT;
             removeAllElementBtn.Content = "Remove All";
             removeAllElementBtn.Click += RemoveAllElement_Click;
             removeAllElementBtn.HorizontalAlignment = HorizontalAlignment.Center;
-            removeAllElementBtn.Margin = new Thickness(10, 2, 10, 0);
+            removeAllElementBtn.Margin = new Thickness(10, -5, 130, -5);
 
-            addSelectedElement.Width = 75;
-            addSelectedElement.Height = 25;
+            addSelectedElement.Width = 120;
+            addSelectedElement.Height = config.BUTTON_HEIGHT;
             addSelectedElement.Content = "Add One";
             addSelectedElement.Click += AddElement_Click;
             addSelectedElement.HorizontalAlignment = HorizontalAlignment.Center;
-            addSelectedElement.Margin = new Thickness(90, 2, 10, 0);
+            addSelectedElement.Margin = new Thickness(125, -5, 10, -5);
 
-            addAllElementBtn.Width = 75;
-            addAllElementBtn.Height = 25;
+            addAllElementBtn.Width = 120;
+            addAllElementBtn.Height = config.BUTTON_HEIGHT;
             addAllElementBtn.Content = "Add All";
             addAllElementBtn.Click += AddAllElement_Click;
             addAllElementBtn.HorizontalAlignment = HorizontalAlignment.Center;
-            addAllElementBtn.Margin = new Thickness(10, 2, 10, 0);
+            addAllElementBtn.Margin = new Thickness(10, -5, 10, -5);
 
             Grid.SetColumn(moveUpBtn, 0);
             controlsGrid.Children.Add(moveUpBtn);
@@ -1745,7 +1870,7 @@ namespace LayTexFileCreator
                 };
                 elementNameBttn.Click += Element_click;
                 elementNameBttn.Content = "(" + element.GetElementType() + ") " + element.GetTitle();
-                elementNameBttn.Width = elementSV.Width - 10;
+                elementNameBttn.Width = elementSV.Width - 20;
                 i++;
                 elementSV.Items.Add(elementNameBttn);
             }
@@ -1797,7 +1922,7 @@ namespace LayTexFileCreator
             grid.Children.Clear();
             grid.RowDefinitions.Clear();
 
-            sv.Content = null;
+            sv.Children.Clear();// = null;
             int idNum = Int32.Parse(id);
             selectedId = idNum;
             //needsAdded = true;
@@ -1817,6 +1942,8 @@ namespace LayTexFileCreator
                 }
             }
 
+           // listBox.Margin
+
             for (int i = 0; i < listTextBox.Count(); i++)
             {
                 tmp = new TextBox();
@@ -1828,10 +1955,11 @@ namespace LayTexFileCreator
                 tmp.Name = "listItemTextBox" + i;
 
                 tmp.Width = sv.Width - 50;
-                tmp.Height = 20;
-                tmp.Background = Brushes.AntiqueWhite;
-                tmp.Foreground = Brushes.Navy;
-                tmp.HorizontalAlignment = HorizontalAlignment.Left;
+                tmp.Height = 30;
+                //tmp.FontSize = 12
+                tmp.Background = config.CONTROL_COLOR;
+                tmp.Foreground = Brushes.White;
+                tmp.HorizontalAlignment = HorizontalAlignment.Center;
                 tmp.TextChanged += UpdatelistText;
                 tmp.SpellCheck.IsEnabled = true;
                 tmp.TextWrapping = 0;
@@ -1852,7 +1980,7 @@ namespace LayTexFileCreator
             grid.Children.Add(listBox);
 
             // Add grid to the app
-            sv.Content = grid;
+            sv.Children.Add(grid);
 
 
             Grid.SetRow(addBtn, 4);
@@ -1885,7 +2013,7 @@ namespace LayTexFileCreator
             deleteBtn.Tag = "Paragraph," + id;
             //Initlize and setup paragraph
             grid.Children.Clear();
-            sv.Content = null;
+            sv.Children.Clear();
             AddGridRows(5);
             int idNum = Int32.Parse(id);
             selectedId = idNum;
@@ -1910,7 +2038,7 @@ namespace LayTexFileCreator
             {
                 grid.RowDefinitions.RemoveAt(grid.RowDefinitions.Count() - 1);
             }
-            sv.Content = grid;
+            sv.Children.Add(grid);
             if (idNum != -1)
             {
                 title.Text = elements.ElementAt(idNum).GetTitle();
@@ -1923,52 +2051,58 @@ namespace LayTexFileCreator
             // Grid
             grid.Width = sv.Width - 25;
             grid.Height = sv.Height - 5;
-            grid.Background = Brushes.FloralWhite;
             grid.HorizontalAlignment = HorizontalAlignment.Left;
 
             // Text Fields
             title.Name = "title";
             title.Text = "";
-            title.Width = sv.Width / 2;
-            title.Height = 20;
-            title.Background = Brushes.AntiqueWhite;
-            title.Foreground = Brushes.Navy;
-            title.HorizontalAlignment = HorizontalAlignment.Left;
-            title.TextChanged += UpdateTitle;
+            title.Width = sv.Width - 40;
+            title.Height = 30;
+            title.FontSize = 14;
+            title.Background = Brushes.DimGray;
+            title.Foreground = Brushes.White;
+            title.ToolTip = "Type your section title here";
+            title.HorizontalAlignment = HorizontalAlignment.Center;
+           // title.TextChanged += UpdateTitle;
             title.SpellCheck.IsEnabled = true;
             title.TextWrapping = 0;
+            title.Margin = new Thickness(5);
+            title.CaretBrush = Brushes.White;
 
             body.Name = "body";
             body.Text = "";
-            body.Width = sv.Width - 35;
-            body.Height = sv.Height - 110;
-            body.Background = Brushes.AntiqueWhite;
-            body.Foreground = Brushes.Navy;
-            body.Margin = new Thickness(3, 0, 5, 0);
-            body.TextChanged += UpdateBody;
+            body.Height = sv.Height - 150;
+            body.Width = sv.Width - 40;
+            body.FontSize = 14;
+            body.Background = Brushes.DimGray;
+            body.Foreground = Brushes.White;
+            body.Margin = new Thickness(5);
+         //   body.TextChanged += UpdateBody;
             body.SpellCheck.IsEnabled = true;
             body.TextWrapping = 0;
-            body.HorizontalAlignment = HorizontalAlignment.Left;
+            body.HorizontalAlignment = HorizontalAlignment.Center;
+            body.ToolTip = "Type your section body here";
+            body.CaretBrush = Brushes.White;
             // Buttons
             deleteBtn.Name = "delete_btn";
             deleteBtn.Content = "Delete";
-            deleteBtn.Height = 25;
-            deleteBtn.Width = 75;
+            deleteBtn.Height = 30;
+            deleteBtn.Width = 150;
             deleteBtn.FontSize = 14;
-            deleteBtn.Margin = new Thickness(5, 5, 10, 5);
+            deleteBtn.Margin = new Thickness(5, 5, 5, 5);
             deleteBtn.FontWeight = FontWeights.Bold;
-            deleteBtn.Foreground = Brushes.Black;
+            deleteBtn.Foreground = Brushes.White;
             deleteBtn.HorizontalAlignment = HorizontalAlignment.Right;
             deleteBtn.Click += DeleteClick;
 
             addBtn.Name = "add_btn";
             addBtn.Content = "Add Element";
-            addBtn.Height = 25;
-            addBtn.Width = 115;
+            addBtn.Height = 30;
+            addBtn.Width = 150;
             addBtn.FontSize = 14;
-            addBtn.Margin = new Thickness(5, 5, 10, 5);
+            addBtn.Margin = new Thickness(7, 5, 5, 5);
             addBtn.FontWeight = FontWeights.Bold;
-            addBtn.Foreground = Brushes.Black;
+            addBtn.Foreground = Brushes.White;
             addBtn.HorizontalAlignment = HorizontalAlignment.Left;
             addBtn.Click += AddClick;
 
@@ -1976,56 +2110,56 @@ namespace LayTexFileCreator
             titleLabel.Name = "titleLabel";
             titleLabel.Content = "Title";
             titleLabel.Width = 135;
-            titleLabel.Height = 25;
-            titleLabel.FontWeight = FontWeights.Bold;
-            titleLabel.Background = Brushes.FloralWhite;
-            titleLabel.FontSize = 12;
+            titleLabel.Height = 30;
+            titleLabel.FontWeight = FontWeights.SemiBold;
+            titleLabel.Foreground = Brushes.White;
+            titleLabel.FontSize = 14;
             titleLabel.HorizontalAlignment = HorizontalAlignment.Left;
 
             bodyLabel.Name = "listLabel";
             bodyLabel.Content = "List Items";
-            bodyLabel.Width = 65;
-            bodyLabel.Height = 25;
-            bodyLabel.FontWeight = FontWeights.Bold;
-            bodyLabel.Background = Brushes.FloralWhite;
-            bodyLabel.FontSize = 12;
+            bodyLabel.Width = 135;
+            bodyLabel.Height = 30;
+            bodyLabel.FontWeight = FontWeights.SemiBold;
+            bodyLabel.Foreground = Brushes.White;
+            bodyLabel.FontSize = 14;
             bodyLabel.HorizontalAlignment = HorizontalAlignment.Left;
 
             // addColumnBtn,removeColumnBtn,addRowBtn,removeRowBtn
             removeRowBtn.Width = 100;
             removeRowBtn.Content = "Remove Row";
             removeRowBtn.Click += RemoveRowBtn_Click;  //AddGridColoums;
-            removeRowBtn.Height = 25;
+            removeRowBtn.Height = 30;
             removeRowBtn.HorizontalAlignment = HorizontalAlignment.Right;
             removeRowBtn.Margin = new Thickness(0, 10, 11, 0);
 
             removeColumnBtn.Width = 100;
             removeColumnBtn.Content = "Remove Column";
             removeColumnBtn.Click += RemoveColumnBtn_Click; //AddGridColoums;
-            removeColumnBtn.Height = 25;
+            removeColumnBtn.Height = 30;
             removeColumnBtn.Margin = new Thickness(130, 10, 0, 0);
             removeColumnBtn.HorizontalAlignment = HorizontalAlignment.Left;
 
             addRowBtn.Width = 100;
             addRowBtn.Content = "Add Row";
             addRowBtn.Click += AddRowBtn_Click;  //AddGridColoums;
-            addRowBtn.Height = 25;
+            addRowBtn.Height = 30;
             addRowBtn.Margin = new Thickness(0, 10, 135, 0);
             addRowBtn.HorizontalAlignment = HorizontalAlignment.Right;
 
             addColumnBtn.Width = 100;
             addColumnBtn.Content = "Add Column";
             addColumnBtn.Click += AddColumnBtn_Click;  //AddGridColoums;
-            addColumnBtn.Height = 25;
+            addColumnBtn.Height = 30;
             addColumnBtn.Margin = new Thickness(5, 10, 0, 0);
             addColumnBtn.HorizontalAlignment = HorizontalAlignment.Left;
 
             //
-            listBox.Height = 200;
-            listBox.Background = Brushes.FloralWhite;
+            listBox.Height = 450;
+            listBox.Background = Brushes.DarkGray;
             listBox.Margin = new Thickness(5);
             listBox.HorizontalAlignment = HorizontalAlignment.Center;
-
+           // listBox.Padding = new Thickness(1);
 
             tableArea.Height = 200;
             tableArea.Background = Brushes.White;
@@ -2040,11 +2174,14 @@ namespace LayTexFileCreator
         private void AddAllElement_Click(object sender, RoutedEventArgs e)
         {
             // First clear all elements 
-            sVAfter.Items.Clear();
+            if (sVAfter != null)
+            {
+                sVAfter.Items.Clear();
+            }
             lSBtnSorted.Clear();
             sortedElements.Clear();
             // Tmp btn and counting var
-            Button last;
+            Button last = new Button();
             int tmpId = 0;
             // Then add all elements
             foreach (Element el in elements)
@@ -2053,8 +2190,10 @@ namespace LayTexFileCreator
                 {
                     Content = "(" + el.GetElementType() + ") " + el.GetTitle(),
                     Tag = tmpId,
-                    Width = sVBefore.Width - 20,
-                    Height = 25
+                    FontSize = config.FONT_SIZE,
+                    Width = 600,
+                    Height = 30,
+                    HorizontalAlignment = HorizontalAlignment.Center
                 };
                 sortedElements.Add(el);
 
@@ -2069,36 +2208,52 @@ namespace LayTexFileCreator
             Button btn = (Button)sender;
             foreach (Button b in lSBtnSorted)
             {
-                b.Background = Brushes.White;
+                b.Background = config.GUI_COLOR;
             }
-            lSBtnSorted[int.Parse(btn.Tag.ToString())].Background = config.ACCENT_COLOR;
+            lSBtnSorted[int.Parse(btn.Tag.ToString())].Background = Brushes.DimGray;
             lSBtnAfter = int.Parse(btn.Tag.ToString());
         }
         private void AddElement_Click(object sender, RoutedEventArgs e)
         {
-            if (lSBtnBefore != -1)
+            try
             {
-                Button last = new Button
+                if (lSBtnBefore != -1)
                 {
-                    Content = "(" + elements[lSBtnBefore].GetElementType() + ") " + elements[lSBtnBefore].GetTitle(),
-                    Tag = lSBtnSorted.Count(),
-                    Width = sVBefore.Width - 20,
-                    Height = 25
-                };
-                sortedElements.Add(elements[lSBtnBefore]);
-                last.Click += SetAfterSelection_Click;
-                lSBtnSorted.Add(last);
-                sVAfter.Items.Add(last);
-                lSBtnBefore = -1;
+                    Button last = new Button
+                    {
+                        Content = "(" + elements[lSBtnBefore].GetElementType() + ") " + elements[lSBtnBefore].GetTitle(),
+                        Tag = lSBtnSorted.Count(),
+                        FontSize = config.FONT_SIZE,
+                        Width = 600,
+                        Height = 30,
+                        HorizontalAlignment = HorizontalAlignment.Center
+                    };
+                    sortedElements.Add(elements[lSBtnBefore]);
+                    last.Click += SetAfterSelection_Click;
+                    lSBtnSorted.Add(last);
+                    sVAfter.Items.Add(last);
+                    lSBtnBefore = -1;
+                }
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
             }
         }
         private void RemoveAllElement_Click(object sender, RoutedEventArgs e)
         {
-            // First clear all elements 
-            sVAfter.Items.Clear();
-            lSBtnSorted.Clear();
-            sortedElements.Clear();
-            lSBtnAfter = -1;
+            try
+            {
+                // First clear all elements 
+                sVAfter.Items.Clear();
+                lSBtnSorted.Clear();
+                sortedElements.Clear();
+                lSBtnAfter = -1;
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
         }
         private void RemoveElement_Click(object sender, RoutedEventArgs e)
         {
@@ -2143,8 +2298,10 @@ namespace LayTexFileCreator
                     {
                         Content = "(" + el.GetElementType() + ") " + el.GetTitle(),
                         Tag = tmpId,
-                        Width = sVBefore.Width - 20,
-                        Height = 25
+                        FontSize = config.FONT_SIZE,
+                        Width = 600,
+                        Height = 30,
+                        HorizontalAlignment = HorizontalAlignment.Center
                     };
                     last.Click += SetAfterSelection_Click;
                     lSBtnSorted.Add(last);
@@ -2168,8 +2325,10 @@ namespace LayTexFileCreator
                     {
                         Content = "(" + el.GetElementType() + ") " + el.GetTitle(),
                         Tag = tmpId,
-                        Width = sVBefore.Width - 20,
-                        Height = 25
+                        FontSize = config.FONT_SIZE,
+                        Width = 600,
+                        Height = 30,
+                        HorizontalAlignment = HorizontalAlignment.Center
                     };
                     last.Click += SetAfterSelection_Click;
                     lSBtnSorted.Add(last);
@@ -2223,27 +2382,28 @@ namespace LayTexFileCreator
             //int idNum = Int32.Parse(id);
             selectedId = id;
             grid.Children.Clear();
-            sv.Content = null;
+            sv.Children.Clear();
             // Reset Image, image btn, Size selection radio btns
             titleLabel.Content = "Figure subtext";
-            titleLabel.Width = 100;
+            titleLabel.Width = sv.Width;
             title = new TextBox
             {
                 Name = "title",
                 Text = "",
-                Width = sv.Width / 2,
-                Height = 20,
-                Background = Brushes.AntiqueWhite,
-                Foreground = Brushes.Navy,
+                Width = sv.Width - 40,
+                Height = 30,
+                Background = config.CONTROL_COLOR,
+                Foreground = config.TEXT_COLOR,
+                FontSize = config.FONT_SIZE,
                 HorizontalAlignment = HorizontalAlignment.Left
             };
-            title.TextChanged += UpdateTitle;
+           // title.TextChanged += UpdateTitle;
             title.SpellCheck.IsEnabled = true;
             title.TextWrapping = 0;
             image = new Image
             {
-                Width = 225,
-                Height = 225,
+                Width = 460,
+                Height = 460,
                 Stretch = Stretch.Uniform,
                 HorizontalAlignment = HorizontalAlignment.Right,
                 VerticalAlignment = VerticalAlignment.Center
@@ -2253,8 +2413,12 @@ namespace LayTexFileCreator
                 Content = "Small",
                 IsChecked = false,
                 GroupName = "imageSize",
+                FontSize = config.FONT_SIZE + 2,
                 Tag = 0,
-                Margin = new Thickness(20, 5, 0, 0)
+                Margin = new Thickness(0, 10, 0, 0),
+                Background = config.ACCENT_COLOR,
+                Foreground = config.TEXT_COLOR,
+                
             };
             smallImage.Click += UpdateImageSize;
             smallImage.HorizontalAlignment = HorizontalAlignment.Left;
@@ -2264,7 +2428,9 @@ namespace LayTexFileCreator
                 IsChecked = true,
                 GroupName = "imageSize",
                 Tag = 1,
-                Margin = new Thickness(0, 5, 0, 0)
+                Margin = new Thickness(0, 10, 0, 0),
+                Background = config.ACCENT_COLOR,
+                Foreground = config.TEXT_COLOR,
             };
             mediumImage.Click += UpdateImageSize;
             mediumImage.HorizontalAlignment = HorizontalAlignment.Center;
@@ -2274,13 +2440,15 @@ namespace LayTexFileCreator
                 IsChecked = false,
                 GroupName = "imageSize",
                 Tag = 2,
-                Margin = new Thickness(0, 5, 20, 0)
+                Margin = new Thickness(0, 10, 0, 0),
+                Background = config.ACCENT_COLOR,
+                Foreground = config.TEXT_COLOR,
             };
             largeImage.Click += UpdateImageSize;
             largeImage.HorizontalAlignment = HorizontalAlignment.Right;
             uploadButton = new Button
             {
-                Width = 50,
+                Width = 150,
                 Height = 50
             };
             uploadButton.Click += OpenImageUploadDialog;
@@ -2310,7 +2478,7 @@ namespace LayTexFileCreator
             Grid.SetRow(deleteBtn, 4);
             grid.Children.Add(deleteBtn);
             //add grid to gui
-            sv.Content = grid;
+            sv.Children.Add(grid);
             //add data to figure if avalible
             if (selectedId != -1)
             {
@@ -2359,7 +2527,7 @@ namespace LayTexFileCreator
         private void UpdateImageSize(object sender, RoutedEventArgs e)
         {
             RadioButton btn = (RadioButton)sender;
-            elements[selectedId].SetImageSize(int.Parse(btn.Tag.ToString()));
+            tmpImageSize =  int.Parse(btn.Tag.ToString());
         }
         private void InitlizeTable(int id)
         {
@@ -2368,7 +2536,7 @@ namespace LayTexFileCreator
             //int idNum = Int32.Parse(id);
             selectedId = id;
             grid.Children.Clear();
-            sv.Content = null;
+            sv.Children.Clear();
             tableGrid = new Grid();
             tableData = new List<List<TextBox>>();
             // Reset Image, image btn, Size selection radio btns
@@ -2380,11 +2548,11 @@ namespace LayTexFileCreator
                 Text = "",
                 Width = sv.Width / 2,
                 Height = 20,
-                Background = Brushes.AntiqueWhite,
+                Background = config.CONTROL_COLOR,
                 Foreground = Brushes.Navy,
                 HorizontalAlignment = HorizontalAlignment.Left
             };
-            title.TextChanged += UpdateTitle;
+         //   title.TextChanged += UpdateTitle;
             title.SpellCheck.IsEnabled = true;
             title.TextWrapping = 0;
 
@@ -2435,7 +2603,7 @@ namespace LayTexFileCreator
             Grid.SetRow(deleteBtn, 4);
             grid.Children.Add(deleteBtn);
 
-            sv.Content = grid;
+            sv.Children.Add(grid);
 
 
         }
@@ -2444,7 +2612,7 @@ namespace LayTexFileCreator
             Grid tGrid = new Grid
             {
                 Width = totalColoums * 100,
-                Height = 25,
+                Height = 30,
                 Background = Brushes.Pink
             };
             ColumnDefinition column;

@@ -5,58 +5,49 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:LayTexFileCreator"
         mc:Ignorable="d"
-        Title="Stonetown Karate Manual Editor" Height="450" Width="800">
-    <Grid>
-        <DockPanel>
-            <Menu DockPanel.Dock="Top">
-                <MenuItem Header="_File" >
-                    <MenuItem Header="_New" Click="NewItem_Click" />
-                    <MenuItem Header="_Open" Click="OpenItem_Click"/>
-                    <MenuItem Header="_Save" Click="SaveItem_Click"/>
-                    <Separator />
-                    <MenuItem Header="_Exit" Click="ExitItem_Click"/>
-                </MenuItem>
-                <MenuItem Header="_Git" >
-                    <MenuItem Header="_Update" Click="UpdateItem_Click" />
-                    <MenuItem Header="_Push" Click="PushItem_Click"/>
-                </MenuItem>
-                <MenuItem Header="_Modes" >
-                    <MenuItem Header="_Open Page Mode" Click="OpenPageMode_Click" />
-                    <MenuItem Header="_Open Chapter Mode" Click="OpenChapterMode_Click" />
-                    <MenuItem Header="_Open Book Mode" Click="OpenBookMode_Click" />
-                </MenuItem>
-                <MenuItem Header="_Help" >
-                    <MenuItem Header="_Open Reference" Click="OpenRefItem_Click"/>
-                </MenuItem>
-            </Menu>
-            <GroupBox Header="Procedure Builder" Height="391" VerticalAlignment="Top" Width="778">
-                <Grid>
-                    <GroupBox Header="Add Element" HorizontalAlignment="Left" Height="86" Margin="556,0,-1,0" VerticalAlignment="Top" Width="211">
-                        <Grid>
-                            <Button Click="AddParagraph_Click" Name="addParagraph" Content="Paragraph" HorizontalAlignment="Left" Margin="15,5,0,0" VerticalAlignment="Top" Width="70" Height="27"/>
-                            <Button Click="AddList_Click" Name="addList" Content="List" HorizontalAlignment="Left" Margin="114,5,0,0" VerticalAlignment="Top" Width="70" Height="27"/>
-                            <Button Click="AddFigure_Click" x:Name="AddFigure" Content="Figure" HorizontalAlignment="Left" Margin="15,36,0,0" VerticalAlignment="Top" Width="70" Height="27"/>
-                            <Button Click="AddTable_Click" x:Name="AddParagraph" Content="Table" HorizontalAlignment="Left" Margin="114,37,0,-1" VerticalAlignment="Top" Width="70" Height="27"/>
-                        </Grid>
-                    </GroupBox>
-                    <GroupBox Header="Elements" HorizontalAlignment="Left" Height="277" Margin="556,91,0,0" VerticalAlignment="Top" Width="210" RenderTransformOrigin="0.2,-0.086">
-                        <Grid>
-                            <ListBox Name="elementSV" HorizontalAlignment="Left" Height="234" Margin="10,10,0,0" VerticalAlignment="Top" Width="178"/>
-                        </Grid>
-                    </GroupBox>
-                    <GroupBox Header="Current Element" HorizontalAlignment="Left" Height="368" Margin="10,0,0,0" VerticalAlignment="Top" Width="541" RenderTransformOrigin="-0.066,-0.036">
-                        <Grid>
-                            <ScrollViewer x:Name="sv" HorizontalAlignment="Left" Height="325" Margin="10,10,0,0" VerticalAlignment="Top" Width="509"/>
-                        </Grid>
-                    </GroupBox>
-
-
+        Title="Stonetown Karate Manual Editor"  Width="1366" Height="768"
+        ResizeMode="CanMinimize"
+        >
+    <Grid HorizontalAlignment="Stretch">
+        <Menu>
+            <MenuItem Header="_File" >
+                <MenuItem Header="_New" Click="NewItem_Click" />
+                <MenuItem Header="_Open" Click="OpenItem_Click"/>
+                <MenuItem Header="_Save" Click="SaveItem_Click"/>
+                <Separator />
+                <MenuItem Header="_Exit" Click="ExitItem_Click"/>
+            </MenuItem>
+            <MenuItem Header="_Git" >
+                <MenuItem Header="_Update" Click="UpdateItem_Click" />
+                <MenuItem Header="_Push" Click="PushItem_Click"/>
+            </MenuItem>
+            <MenuItem Header="_Modes" >
+                <MenuItem Header="_Open Page Mode" Click="OpenPageMode_Click" />
+                <MenuItem Header="_Open Chapter Mode" Click="OpenChapterMode_Click" />
+                <MenuItem Header="_Open Book Mode" Click="OpenBookMode_Click" />
+            </MenuItem>
+            <MenuItem Header="_Help" >
+                <MenuItem Header="_Open Reference" Click="OpenRefItem_Click"/>
+            </MenuItem>
+        </Menu>
+        <Grid Margin="0,49,0,0">
+            <GroupBox FontSize="14" Header="Add Element" HorizontalAlignment="Left" Height="127" Margin="1038,0,0,0" VerticalAlignment="Top" Width="302">
+                <Grid Width="299">
+                    <Button FontSize="14" Click="AddParagraph_Click" Name="addParagraph" Content="Paragraph" HorizontalAlignment="Left" Margin="15,5,0,0" VerticalAlignment="Top" Width="100" Height="27"/>
+                    <Button FontSize="14" Click="AddList_Click" Name="addList" Content="List" HorizontalAlignment="Left" Margin="172,5,0,0" VerticalAlignment="Top" Width="100" Height="27"/>
+                    <Button FontSize="14" Click="AddFigure_Click" x:Name="AddFigure" Content="Figure" HorizontalAlignment="Left" Margin="15,40,0,0" VerticalAlignment="Top" Width="100" Height="27"/>
+                    <Button FontSize="14" Click="AddTable_Click" x:Name="AddParagraph" Content="Table" HorizontalAlignment="Left" Margin="172,41,0,0" VerticalAlignment="Top" Width="100" Height="27"/>
                 </Grid>
             </GroupBox>
-
-
-        </DockPanel>
-
-
+            <GroupBox FontSize="14" Header="Elements" HorizontalAlignment="Left" Height="531" Margin="1038,139,0,0" VerticalAlignment="Top" Width="302" RenderTransformOrigin="0.2,-0.086">
+                <Grid>
+                    <ListBox FontSize="14" Name="elementSV" HorizontalAlignment="Left" Height="476" VerticalAlignment="Top" Width="282"/>
+                </Grid>
+            </GroupBox>
+            <GroupBox FontSize="14" Header="Current Element" HorizontalAlignment="Left" Height="670" Margin="10,0,0,0" VerticalAlignment="Top" Width="1018" RenderTransformOrigin="-0.066,-0.036">
+                <Grid x:Name="sv" HorizontalAlignment="Left" Height="598" Margin="10,10,0,0" VerticalAlignment="Top" Width="980">
+                </Grid>
+            </GroupBox>
+        </Grid>
     </Grid>
 </Window>

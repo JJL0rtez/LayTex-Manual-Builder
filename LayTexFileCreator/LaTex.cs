@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace LayTexFileCreator
 {
@@ -36,7 +38,7 @@ namespace LayTexFileCreator
 			}
 			return data;
 		}
-		private List<string> doList(bool isSection, Element element)
+		private List<string> DoList(bool isSection, Element element)
 		{
 			List<string> data = new List<string>();
 			try
@@ -52,10 +54,13 @@ namespace LayTexFileCreator
 				data.Add("\\subsection{" + element.GetTitle() + "}");
 			}
 			data.Add("\\begin{enumerate}");
-			foreach (string listItem in element.GetListItems())
-			{
-				data.Add("  \\item " + listItem);
-			}
+				foreach (string listItem in element.GetListItems())
+				{
+					if (listItem != "")
+					{
+						data.Add("  \\item " + listItem);
+					}
+				}
 			data.Add("\\end{enumerate}");
 			data.Add("");
 		    } 
@@ -66,12 +71,15 @@ namespace LayTexFileCreator
 			}
 			return data;
 		}
-		private List<string> doFigure(bool isSection, Element element)
+		private List<string> DoFigure(bool isSection, Element element)
 		{
 			List<string> data = new List<string>();
 			try
 			{
-				File.Copy(element.GetImageLocation(), config.IMAGE_GRAPHICS_PATH);
+				if (!File.Exists(element.GetImageLocation()))
+				{
+					File.Copy(element.GetImageLocation(), config.IMAGE_GRAPHICS_PATH);
+				}
 			}
 			catch(IOException ioEx)
 			{
@@ -79,19 +87,22 @@ namespace LayTexFileCreator
 			}
 			try
 			{
+				string tmp = Path.GetFileName(element.GetImageLocation());
+				tmp.Replace(".png", "");
+				tmp.Replace(".jpeg", "");
 				data.Add("\\begin{figure}[!htb]");
 				data.Add("\\centering");
 				if (element.GetImageSize() == 0)
 				{
-					data.Add("\\includegraphics[width = 4cm, height = 3.44cm]{" + element.GetImageLocation().Substring(element.GetImageLocation().LastIndexOf(" / ", element.GetImageLocation().Last())) + " } ");
+					data.Add("\\includegraphics[width = 4cm, height = 3.44cm]{" + Path.GetFileName(element.GetImageLocation()) + "} ");
 				}
 				else if (element.GetImageSize() == 2)
 				{
-					data.Add("\\includegraphics[width = 8cm, height = 6.88cm]{" + element.GetImageLocation().Substring(element.GetImageLocation().LastIndexOf(" / ", element.GetImageLocation().Last())) + " } ");
+					data.Add("\\includegraphics[width = 8cm, height = 6.88cm]{" + Path.GetFileName(element.GetImageLocation()) + "} ");
 				}
 				else
 				{
-					data.Add("\\includegraphics[width = 6cm, height = 4.66cm]{" + element.GetImageLocation().Substring(element.GetImageLocation().LastIndexOf(" / ", element.GetImageLocation().Last())) + " } ");
+					data.Add("\\includegraphics[width = 6cm, height = 4.66cm]{" + Path.GetFileName(element.GetImageLocation()) + "} ");
 
 				}
 				data.Add("\\caption{" + element.GetTitle() + "}");
@@ -125,11 +136,11 @@ namespace LayTexFileCreator
 							}
 							else if (element.GetElementType() == "List")
 							{
-								data[tmp].AddRange(doList(isSection, element));
+								data[tmp].AddRange(DoList(isSection, element));
 							}
 							else if (element.GetElementType() == "Figure")
 							{
-								data[tmp].AddRange(doFigure(isSection, element));
+								data[tmp].AddRange(DoFigure(isSection, element));
 							}
 						}
 					}
@@ -246,12 +257,22 @@ namespace LayTexFileCreator
 				file.WriteLine("\\tableofcontents");
 
 				List<List<String>> chapterData = CompileChapter(book);
+				String tmpStr = "";
 
 				foreach(List<String> chapter in chapterData)
 				{
 					foreach(string pageLine in chapter)
 					{
-						file.WriteLine(pageLine);
+						tmpStr = Regex.Replace(pageLine, @"[^\u0000-\u007F]+", string.Empty);
+						//tmpStr = tmpStr.Replace(" \\ ", "\\textbackslash ");
+						tmpStr = tmpStr.Replace("&", "\\& ");
+						tmpStr = tmpStr.Replace("$", "\\$ ");
+						//tmpStr = tmpStr.Replace("{", "\\{ ");
+						//tmpStr = tmpStr.Replace("}", "\\} ");
+						tmpStr = tmpStr.Replace(">", "\\textgreater ");
+						tmpStr = tmpStr.Replace("<", "\\textless ");
+						tmpStr = tmpStr.Replace("\u200B", "");
+						file.WriteLine(tmpStr);
 					}
 				}
 				file.WriteLine("");
@@ -265,7 +286,8 @@ namespace LayTexFileCreator
 				}
 				file.WriteLine("\\end{document}");
 				file.Close();
-				
+
+				MessageBox.Show("Book has been compiled and saved.");
 			}
         }
 

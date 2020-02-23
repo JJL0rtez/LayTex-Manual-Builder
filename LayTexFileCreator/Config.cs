@@ -16,6 +16,8 @@ namespace LayTexFileCreator
         public Brush GUI_COLOR { get; set; }
         public Brush ACCENT_COLOR { get; set; }
 
+        public Brush GROUPBOX_COLOR { get; set; }
+
         public string RAW_TEX_LOCATION { get; set; }
         public string DEFAULT_DIRECTORY_LOCATION { get; set; }
         public string DEFAULT_PAGE_LOCATION { get; set; }
@@ -33,13 +35,18 @@ namespace LayTexFileCreator
         public bool SHOW_LIST_OF_TABLES { get; set; }
         public FontFamily FONT_FAMILY { get; set; }
         public double FONT_SCALER { get; set; }
-
+        public Brush TEXT_COLOR { get; set; }
+        public int FONT_SIZE { get; set; }
+        public int BUTTON_HEIGHT { get; set; }
         public Config() {
             // Program Colors
-            BACKGROUND_COLOR = Brushes.AntiqueWhite;
-            CONTROL_COLOR = Brushes.AntiqueWhite;
-            GUI_COLOR = Brushes.FloralWhite;
-            ACCENT_COLOR = Brushes.LightGray;
+            BrushConverter bc = new BrushConverter();  
+            BACKGROUND_COLOR = (Brush)bc.ConvertFrom("#2F2F2F");
+            CONTROL_COLOR = Brushes.DimGray;
+            GUI_COLOR = (Brush)bc.ConvertFrom("#F44336");
+            ACCENT_COLOR = Brushes.Red;
+            TEXT_COLOR = Brushes.White;
+            GROUPBOX_COLOR = (Brush)bc.ConvertFrom("#3b3a3a");
             // Storage locations
             DEFAULT_DIRECTORY_LOCATION = "C:/StonetownKarateManual";
             RAW_TEX_LOCATION = DEFAULT_DIRECTORY_LOCATION + "/PreCompile/BookBackups";
@@ -61,6 +68,9 @@ namespace LayTexFileCreator
             SHOW_LIST_OF_TABLES = false;
             FONT_FAMILY = new FontFamily("Times New Roman");
             FONT_SCALER = 1;
+            // Gui Presets
+            FONT_SIZE = 12;
+            BUTTON_HEIGHT = 30;
         }
     }
 }

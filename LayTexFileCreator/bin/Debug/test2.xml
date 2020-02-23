@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<Page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <name>test2</name>
+  <dateCreated>4:27:23 AM</dateCreated>
+  <elements>
+    <Element>
+      <title>Adult Karate​ Classes</title>
+      <ImageSize>1</ImageSize>
+      <listItems />
+      <Body>A perfect blend of Karate, Self-defense and fitness that will give you the confidence to protect yourself and loved ones.</Body>
+      <ElementType>Paragraph</ElementType>
+      <TableContents />
+    </Element>
+    <Element>
+      <title>this is a figure of our logo</title>
+      <ImageSize>1</ImageSize>
+      <listItems />
+      <ImageLoc>C:\Users\jjlor\Desktop\images\logo.png</ImageLoc>
+      <ElementType>Figure</ElementType>
+      <TableContents />
+    </Element>
+    <Element>
+      <title>Junior Karate Classes</title>
+      <ImageSize>1</ImageSize>
+      <listItems />
+      <Body>Give your child a positive start on life. Children ages 5 &amp; up will benefit from Karate principles and our unique Life Skills program</Body>
+      <ElementType>Paragraph</ElementType>
+      <TableContents />
+    </Element>
+    <Element>
+      <title>List of Classes</title>
+      <ImageSize>1</ImageSize>
+      <listItems>
+        <string>Little Ninja's Karate Classes</string>
+        <string>Junior Karate Classes</string>
+        <string>Adult Karate​ Classes</string>
+        <string>Adult Cardio Kickboxing Classes</string>
+        <string />
+      </listItems>
+      <ElementType>List</ElementType>
+      <TableContents />
+    </Element>
+  </elements>
+  <dateEdited>4:32:18 AM</dateEdited>
+</Page>
