@@ -13,7 +13,8 @@ namespace LayTexFileCreator
     {
         public List<Page> Pages;
         public string ChapterName;
-
+        public string dateCreated;
+        public string dateEdited;
         public Chapter(){ }
 
         public Chapter(List<Page> pages, string chapterName)
@@ -42,12 +43,12 @@ namespace LayTexFileCreator
 
         internal void SetDateEdited(string v)
         {
-            
+            this.dateEdited = v;
         }
 
         internal void SetDateCreated(string v)
         {
-            
+            this.dateCreated = v;
         }
 
         internal string GetDateCreated()

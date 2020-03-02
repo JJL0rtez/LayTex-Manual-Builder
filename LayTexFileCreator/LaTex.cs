@@ -13,7 +13,7 @@ namespace LayTexFileCreator
     {
         Config config = new Config();
 		
-		private List<string> doParagraph(bool isSection, Element element)
+		private List<string> DoParagraph(bool isSection, Element element)
 		{
 			List<string> data = new List<string>();
 			try
@@ -71,7 +71,7 @@ namespace LayTexFileCreator
 			}
 			return data;
 		}
-		private List<string> DoFigure(bool isSection, Element element)
+		private List<string> DoFigure(Element element)
 		{
 			List<string> data = new List<string>();
 			try
@@ -132,7 +132,7 @@ namespace LayTexFileCreator
 						{
 							if (element.GetElementType() == "Paragraph")
 							{
-								data[tmp].AddRange(doParagraph(isSection, element));
+								data[tmp].AddRange(DoParagraph(isSection, element));
 							}
 							else if (element.GetElementType() == "List")
 							{
@@ -140,13 +140,14 @@ namespace LayTexFileCreator
 							}
 							else if (element.GetElementType() == "Figure")
 							{
-								data[tmp].AddRange(DoFigure(isSection, element));
+								data[tmp].AddRange(DoFigure(element));
 							}
 						}
+						tmp++;
 					}
 				}
 
-				tmp++;
+				
 			}
 			return data;
 		}
@@ -183,7 +184,7 @@ namespace LayTexFileCreator
 				System.IO.Directory.CreateDirectory("C:\\StonetownKarateManual\\bin\\images");
 			}
 			string compiledFile = config.RAW_TEX_LOCATION + "/" + DateTime.Now.ToString("yy_MM_dd_h_mm_ss_tt_") + "CompiledBook.tex",
-				line = "";
+				line;
 			if (!System.IO.File.Exists(compiledFile))
 			{
 				using (FileStream fs = File.Create(compiledFile))
@@ -198,12 +199,20 @@ namespace LayTexFileCreator
 			{
 				file.WriteLine("\\documentclass{report}");
 				file.WriteLine("\\usepackage[utf8]{inputenc}");
+				file.WriteLine("\\usepackage{ geometry}");
+				file.WriteLine("\\geometry{");
+				file.WriteLine("a4paper,");
+				file.WriteLine("total ={ 170mm,257mm},");
+				file.WriteLine("left = 20mm,");
+				file.WriteLine("top = 20mm,");
+				file.WriteLine("}");
 				file.WriteLine("\\usepackage[english]{ babel}");
 				file.WriteLine("\\usepackage{fancyhdr}");
 				file.WriteLine("\\usepackage{lastpage}");
 				file.WriteLine("\\usepackage{xcolor}");
 				file.WriteLine("\\usepackage{blindtext}");
 				file.WriteLine("\\usepackage{graphicx}");
+				file.WriteLine("\\usepackage[colorlinks, urlcolor = red, linkcolor = red, citecolor = red, filecolor = red]{hyperref}");
 				file.WriteLine("\\graphicspath{ {" + config.IMAGE_GRAPHICS_PATH + "/} }");
 				file.WriteLine("");
 				file.WriteLine("\\pagestyle{fancy}");
@@ -227,7 +236,7 @@ namespace LayTexFileCreator
 				file.WriteLine("\\rule{\\textwidth}{0.4pt} % Thin horizontal rule");
 				file.WriteLine("");
 				file.WriteLine("\\vspace{0.75\\baselineskip} % Whitespace above the title");
-				line = "{\\LARGE";
+				line = "{\\huge";
 				foreach(string titleLine in config.BOOK_TITLE)
 				{
 					line += " " + titleLine + "\\\\";
@@ -243,14 +252,14 @@ namespace LayTexFileCreator
 				file.WriteLine("\\vspace{2\\baselineskip} % Whitespace after the title block");
 				file.WriteLine("\\vspace{2\\baselineskip}");
 				file.WriteLine("");
-				file.WriteLine("\\textcolor{red}{" + config.COVER_MESSAGE + "}");
+				file.WriteLine("\\textcolor{red}{\\large " + config.COVER_MESSAGE + "}");
 				file.WriteLine("");
 				file.WriteLine("\\vspace *{3\\baselineskip}");
 				file.WriteLine("");
-				file.WriteLine("Created By");
+				file.WriteLine("\\large Created By");
 				file.WriteLine("");
 				file.WriteLine("\\vspace{0.5\\baselineskip}");
-				file.WriteLine("{\\scshape\\Large Stonetown Karate Centre}");
+				file.WriteLine("{\\scshape\\huge Stonetown Karate Centre}");
 				file.WriteLine("\\vspace{0.5\\baselineskip}");
 				file.WriteLine("");
 				file.WriteLine("\\end{titlepage}");

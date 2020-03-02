@@ -55,9 +55,11 @@ namespace LayTexFileCreator
             COMPILED_MANUAL_LOCATION = DEFAULT_DIRECTORY_LOCATION + "/CompiledBookBackups";
             // Book Cover Presets
             CREATED_BY = "STONETOWN KARATE CENTRE";
-            BOOK_TITLE = new List<string>();
-            BOOK_TITLE.Add("STONETOWN KARATE");
-            BOOK_TITLE.Add("OPERATIONS MANUAL");
+            BOOK_TITLE = new List<string>
+            {
+                "STONETOWN KARATE",
+                "OPERATIONS MANUAL"
+            };
             COVER_MESSAGE = "A Comprehensive Collection of Procedures for the Successful Operation of a Stonetown Karate Centre Dojo";
             COVER_LOGO_LOCATION = "logo";
             // General Book Presets

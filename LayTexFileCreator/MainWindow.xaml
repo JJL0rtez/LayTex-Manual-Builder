@@ -7,6 +7,8 @@
         mc:Ignorable="d"
         Title="Stonetown Karate Manual Editor"  Width="1366" Height="768"
         ResizeMode="CanMinimize"
+        FontSize="15"
+        
         >
     <Grid HorizontalAlignment="Stretch">
         <Menu>
@@ -27,7 +29,11 @@
                 <MenuItem Header="_Open Book Mode" Click="OpenBookMode_Click" />
             </MenuItem>
             <MenuItem Header="_Help" >
-                <MenuItem Header="_Open Reference" Click="OpenRefItem_Click"/>
+                <MenuItem Header="_Open LayTex Reference" Click="OpenRefItem_Click"/>
+                <MenuItem Header="_Open Tutorials Document" Click="OpenTutorialDocument_Click"/>
+            </MenuItem>
+            <MenuItem Header="_Settings" >
+                <MenuItem Header="_Open Settings Page" Click="OpenSettingsPage_Click"/>
             </MenuItem>
         </Menu>
         <Grid Margin="0,49,0,0">
