@@ -1,7 +1,25 @@
 # LayTex-Manual-Builder
 
+===================================================================================================
+# Future Features
+1.  Ability to add tables to your manual
+2.  Expanded settings functionality
+3.  Compile themes. (make the manual comple in a custom way)
+4.  Installer
+5.  Program themes
+6.  "Add to start menu" option
+7.  "Add to desktop" option
+8.  "Add to taskbar" option
 
-TODO
+===================================================================================================
+# Know Bugs
+1.  Window to large by default on low res devices
+2.  Gui breaks when switching between table and other views
+3.  Hard crash when accessing if required files are not found
+4. 
+
+===================================================================================================
+# TODO
 1.  Create installer
 2.  Fix visual error when switching between views
 3.  Disable table button for production until feature is finished
