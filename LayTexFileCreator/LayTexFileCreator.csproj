@@ -89,6 +89,7 @@
     <Compile Include="Book.cs" />
     <Compile Include="Chapter.cs" />
     <Compile Include="Config.cs" />
+    <Compile Include="Installer.cs" />
     <Compile Include="LaTex.cs" />
     <Compile Include="Page.cs" />
     <Compile Include="Element.cs" />
@@ -118,6 +119,9 @@
     <None Include="..\.editorconfig">
       <Link>.editorconfig</Link>
     </None>
+    <None Include="images\Save Files.bat" />
+    <None Include="images\tutorialDocument.pdf" />
+    <None Include="images\Update Files.bat" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

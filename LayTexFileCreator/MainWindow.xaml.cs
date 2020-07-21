@@ -137,7 +137,22 @@ namespace LayTexFileCreator {
 		// Grid initialWindowGrid = new Grid();
 
 		public MainWindow() {
-			//OpenInitialWindow();
+			// Test program before launching to prevent crashes and corruption
+			Installer installer = new Installer();
+			if (!installer.CheckFileStructure())
+			{
+				MessageBox.Show("Error in file structure.\nNow running program repair.");
+				if (installer.Install())
+				{
+					MessageBox.Show("Program repair sucessful!\nPlease re-open program.");
+				}
+				else
+				{
+					MessageBox.Show("Program repair failed!.\nPlease contact developer.");
+				}
+				Exit();
+			}
+			// Initlize program
 			InitlizePageEditor();
 
 			//this.Mouse.
@@ -1059,7 +1074,7 @@ namespace LayTexFileCreator {
 			//       txtEditor.Text = File.ReadAllText(openFileDialog.FileName);
 		}
 		private void ExitItem_Click(object sender, RoutedEventArgs e) {
-			System.Windows.Application.Current.Shutdown();
+			Exit();
 		}
 		private void OpenBookMode_Click(object sender, RoutedEventArgs e) {
 			// First open new page
@@ -2510,74 +2525,75 @@ namespace LayTexFileCreator {
 			//lineSpacingBtn.Padding = new Thickness(3);
 			//lineSpacingBtn.Margin = new Thickness(0, 0, 5, 0);
 			//lineSpacingBtn.Click += SetLineSpacing_Click;
+			try
+			{
+				boldBtn.Content = iconImage[1];
+				boldBtn.Width = 35;
+				boldBtn.Height = 35;
+				boldBtn.HorizontalAlignment = HorizontalAlignment.Right;
+				boldBtn.Padding = new Thickness(3);
+				boldBtn.Margin = new Thickness(0, 0, 45, 0);
+				boldBtn.Click += SetBold_Click;
 
-			boldBtn.Content = iconImage[1];
-			boldBtn.Width = 35;
-			boldBtn.Height = 35;
-			boldBtn.HorizontalAlignment = HorizontalAlignment.Right;
-			boldBtn.Padding = new Thickness(3);
-			boldBtn.Margin = new Thickness(0, 0, 45, 0);
-			boldBtn.Click += SetBold_Click;
+				italicBtn.Content = iconImage[2];
+				italicBtn.Width = 35;
+				italicBtn.Height = 35;
+				italicBtn.HorizontalAlignment = HorizontalAlignment.Right;
+				italicBtn.Padding = new Thickness(3);
+				italicBtn.Margin = new Thickness(0, 0, 85, 0);
+				italicBtn.Click += SetItalic_Click;
 
-			italicBtn.Content = iconImage[2];
-			italicBtn.Width = 35;
-			italicBtn.Height = 35;
-			italicBtn.HorizontalAlignment = HorizontalAlignment.Right;
-			italicBtn.Padding = new Thickness(3);
-			italicBtn.Margin = new Thickness(0, 0, 85, 0);
-			italicBtn.Click += SetItalic_Click;
+				leftAllignBtn.Content = iconImage[3];
+				leftAllignBtn.Width = 35;
+				leftAllignBtn.Height = 35;
+				leftAllignBtn.HorizontalAlignment = HorizontalAlignment.Right;
+				leftAllignBtn.Padding = new Thickness(3);
+				leftAllignBtn.Margin = new Thickness(0, 0, 205, 0);
+				leftAllignBtn.Click += SetAllignLeft_Click;
+				leftAllignBtn.Background = Brushes.DimGray;
+				leftAllignBtn.BorderBrush = Brushes.DimGray;
 
-			leftAllignBtn.Content = iconImage[3];
-			leftAllignBtn.Width = 35;
-			leftAllignBtn.Height = 35;
-			leftAllignBtn.HorizontalAlignment = HorizontalAlignment.Right;
-			leftAllignBtn.Padding = new Thickness(3);
-			leftAllignBtn.Margin = new Thickness(0, 0, 205, 0);
-			leftAllignBtn.Click += SetAllignLeft_Click;
-			leftAllignBtn.Background = Brushes.DimGray;
-			leftAllignBtn.BorderBrush = Brushes.DimGray;
+				rightAllignBtn.Content = iconImage[4];
+				rightAllignBtn.Width = 35;
+				rightAllignBtn.Height = 35;
+				rightAllignBtn.HorizontalAlignment = HorizontalAlignment.Right;
+				rightAllignBtn.Padding = new Thickness(3);
+				rightAllignBtn.Margin = new Thickness(0, 0, 125, 0);
+				rightAllignBtn.Click += SetAllignRignt_Click;
 
-			rightAllignBtn.Content = iconImage[4];
-			rightAllignBtn.Width = 35;
-			rightAllignBtn.Height = 35;
-			rightAllignBtn.HorizontalAlignment = HorizontalAlignment.Right;
-			rightAllignBtn.Padding = new Thickness(3);
-			rightAllignBtn.Margin = new Thickness(0, 0, 125, 0);
-			rightAllignBtn.Click += SetAllignRignt_Click;
+				centerAllignBtn.Content = iconImage[5];
+				centerAllignBtn.Width = 35;
+				centerAllignBtn.Height = 35;
+				centerAllignBtn.HorizontalAlignment = HorizontalAlignment.Right;
+				centerAllignBtn.Padding = new Thickness(3);
+				centerAllignBtn.Margin = new Thickness(0, 0, 165, 0);
+				centerAllignBtn.Click += SetAllignCenter_Click;
 
-			centerAllignBtn.Content = iconImage[5];
-			centerAllignBtn.Width = 35;
-			centerAllignBtn.Height = 35;
-			centerAllignBtn.HorizontalAlignment = HorizontalAlignment.Right;
-			centerAllignBtn.Padding = new Thickness(3);
-			centerAllignBtn.Margin = new Thickness(0, 0, 165, 0);
-			centerAllignBtn.Click += SetAllignCenter_Click;
+				smallCapsBtn.Content = iconImage[6];
+				smallCapsBtn.Width = 35;
+				smallCapsBtn.Height = 35;
+				smallCapsBtn.HorizontalAlignment = HorizontalAlignment.Right;
+				smallCapsBtn.Padding = new Thickness(3);
+				smallCapsBtn.Margin = new Thickness(0, 0, 285, 0);
+				smallCapsBtn.Click += SetSmallCaps_Click;
 
-			smallCapsBtn.Content = iconImage[6];
-			smallCapsBtn.Width = 35;
-			smallCapsBtn.Height = 35;
-			smallCapsBtn.HorizontalAlignment = HorizontalAlignment.Right;
-			smallCapsBtn.Padding = new Thickness(3);
-			smallCapsBtn.Margin = new Thickness(0, 0, 285, 0);
-			smallCapsBtn.Click += SetSmallCaps_Click;
+				LinkBtn.Content = iconImage[7];
+				LinkBtn.Width = 35;
+				LinkBtn.Height = 35;
+				LinkBtn.HorizontalAlignment = HorizontalAlignment.Right;
+				LinkBtn.Padding = new Thickness(3);
+				LinkBtn.Margin = new Thickness(0, 0, 245, 0);
+				LinkBtn.Click += SetLink_Click;
 
-			LinkBtn.Content = iconImage[7];
-			LinkBtn.Width = 35;
-			LinkBtn.Height = 35;
-			LinkBtn.HorizontalAlignment = HorizontalAlignment.Right;
-			LinkBtn.Padding = new Thickness(3);
-			LinkBtn.Margin = new Thickness(0, 0, 245, 0);
-			LinkBtn.Click += SetLink_Click;
+				textColorBtn.Content = iconImage[8];
+				textColorBtn.Width = 35;
+				textColorBtn.Height = 35;
+				textColorBtn.HorizontalAlignment = HorizontalAlignment.Right;
+				textColorBtn.Padding = new Thickness(3);
+				textColorBtn.Margin = new Thickness(0, 0, 325, 0);
+				textColorBtn.Click += SetTextColor_Click;
 
-			textColorBtn.Content = iconImage[8];
-			textColorBtn.Width = 35;
-			textColorBtn.Height = 35;
-			textColorBtn.HorizontalAlignment = HorizontalAlignment.Right;
-			textColorBtn.Padding = new Thickness(3);
-			textColorBtn.Margin = new Thickness(0, 0, 325, 0);
-			textColorBtn.Click += SetTextColor_Click;
-
-			List<string> colors = new List<string> {
+				List<string> colors = new List<string> {
 				"black",
 				"blue",
 				"brown",
@@ -2597,26 +2613,26 @@ namespace LayTexFileCreator {
 				"white",
 				"yellow"
 			};
-			textColorCB.ItemsSource = colors;
-			textColorCB.Margin = new Thickness(0, 0, 405, 0);
-			textColorCB.Padding = new Thickness(5);
-			textColorCB.Width = 80;
-			textColorCB.Foreground = Brushes.White;
-			textColorCB.Background = Brushes.DimGray;
-			textColorCB.FontSize = 14;
-			textColorCB.HorizontalAlignment = HorizontalAlignment.Right;
+				textColorCB.ItemsSource = colors;
+				textColorCB.Margin = new Thickness(0, 0, 405, 0);
+				textColorCB.Padding = new Thickness(5);
+				textColorCB.Width = 80;
+				textColorCB.Foreground = Brushes.White;
+				textColorCB.Background = Brushes.DimGray;
+				textColorCB.FontSize = 14;
+				textColorCB.HorizontalAlignment = HorizontalAlignment.Right;
 
-			underLinebtn.Content = iconImage[9];
-			underLinebtn.Width = 35;
-			underLinebtn.Height = 35;
-			underLinebtn.HorizontalAlignment = HorizontalAlignment.Right;
-			underLinebtn.Padding = new Thickness(3);
-			underLinebtn.Margin = new Thickness(0, 0, 5, 0);
-			underLinebtn.Click += SetUnderline_Click;
+				underLinebtn.Content = iconImage[9];
+				underLinebtn.Width = 35;
+				underLinebtn.Height = 35;
+				underLinebtn.HorizontalAlignment = HorizontalAlignment.Right;
+				underLinebtn.Padding = new Thickness(3);
+				underLinebtn.Margin = new Thickness(0, 0, 5, 0);
+				underLinebtn.Click += SetUnderline_Click;
 
-			textSizeCB.SelectedIndex = 4;
-			textSizeCB.Text = "normal";
-			List<string> textSizes = new List<string> {
+				textSizeCB.SelectedIndex = 4;
+				textSizeCB.Text = "normal";
+				List<string> textSizes = new List<string> {
 				"tiny",
 				"scriptsize",
 				"footnotesize",
@@ -2628,30 +2644,30 @@ namespace LayTexFileCreator {
 				"huge",
 				"Huge"
 			};
-			textSizeCB.ItemsSource = textSizes;
-			textSizeCB.Margin = new Thickness(0, 0, 495, 0);
-			textSizeCB.Padding = new Thickness(5);
-			textSizeCB.Width = 80;
-			textSizeCB.Foreground = Brushes.White;
-			textSizeCB.Background = Brushes.DimGray;
-			textSizeCB.FontSize = 14;
-			textSizeCB.HorizontalAlignment = HorizontalAlignment.Right;
-			textSizeCB.SelectionChanged += SetTextSize_Click;
+				textSizeCB.ItemsSource = textSizes;
+				textSizeCB.Margin = new Thickness(0, 0, 495, 0);
+				textSizeCB.Padding = new Thickness(5);
+				textSizeCB.Width = 80;
+				textSizeCB.Foreground = Brushes.White;
+				textSizeCB.Background = Brushes.DimGray;
+				textSizeCB.FontSize = 14;
+				textSizeCB.HorizontalAlignment = HorizontalAlignment.Right;
+				textSizeCB.SelectionChanged += SetTextSize_Click;
 
-			textSizeLabel.Content = "Text Size";
-			textSizeLabel.Foreground = Brushes.White;
-			textSizeLabel.HorizontalAlignment = HorizontalAlignment.Right;
-			textSizeLabel.FontSize = 14;
-			textSizeLabel.Margin = new Thickness(0, 0, 580, 0);
-			textSizeLabel.VerticalAlignment = VerticalAlignment.Center;
+				textSizeLabel.Content = "Text Size";
+				textSizeLabel.Foreground = Brushes.White;
+				textSizeLabel.HorizontalAlignment = HorizontalAlignment.Right;
+				textSizeLabel.FontSize = 14;
+				textSizeLabel.Margin = new Thickness(0, 0, 580, 0);
+				textSizeLabel.VerticalAlignment = VerticalAlignment.Center;
 
-			closeBtn.Content = iconImage[10];
-			closeBtn.Width = 35;
-			closeBtn.Height = 35;
-			closeBtn.HorizontalAlignment = HorizontalAlignment.Right;
-			closeBtn.Padding = new Thickness(3);
-			closeBtn.Margin = new Thickness(0, 0, 365, 0);
-			closeBtn.Click += SetClearFormatting_Click;
+				closeBtn.Content = iconImage[10];
+				closeBtn.Width = 35;
+				closeBtn.Height = 35;
+				closeBtn.HorizontalAlignment = HorizontalAlignment.Right;
+				closeBtn.Padding = new Thickness(3);
+				closeBtn.Margin = new Thickness(0, 0, 365, 0);
+				closeBtn.Click += SetClearFormatting_Click;
 
 			// Add elements to the grid
 			Grid.SetRow(titleLabel, 0);
@@ -2703,6 +2719,28 @@ namespace LayTexFileCreator {
 				body.Text = elements.ElementAt(idNum).GetBody();
 				// body.Text = ;
 			}
+			}
+			catch (ArgumentOutOfRangeException ex)
+			{
+				// This type of error will be triggered if files are missing from the install
+				MessageBox.Show("Error in file structure.\nNow running program repair.");
+				Installer installer = new Installer();
+				if (installer.Install())
+				{
+					MessageBox.Show("Program repair sucessful!\nPlease re-open program.");
+				}
+				else
+				{
+					MessageBox.Show("Program repair failed!.\nPlease contact developer.");
+				}
+				Exit();
+				
+			}
+		}
+
+		private void Exit()
+		{
+			System.Windows.Application.Current.Shutdown();
 		}
 
 		private void SetClearFormatting_Click(object sender, RoutedEventArgs e) {
@@ -3170,7 +3208,6 @@ namespace LayTexFileCreator {
 			addBtn.Tag = "Figure," + id;
 			deleteBtn.Tag = "Figure," + id;
 			// Clear other Controls
-			//int idNum = Int32.Parse(id);
 			selectedId = id;
 			grid.Children.Clear();
 			sv.Children.Clear();
@@ -3244,6 +3281,7 @@ namespace LayTexFileCreator {
 			AddGridRows(5);
 			//AddGridColoums(5);
 			//Add Controls to grid
+			
 			Grid.SetRow(titleLabel, 0);
 			grid.Children.Add(titleLabel);
 			Grid.SetRow(title, 1);
@@ -3459,14 +3497,6 @@ namespace LayTexFileCreator {
 				Console.WriteLine(ex.Message);
 				return false;
 			}
-			//string StringFromRichTextBox(RichTextBox rtb)
-			//{
-			//    TextRange textRange = new TextRange(
-			//        rtb.Document.ContentStart,
-			//        rtb.Document.ContentEnd
-			//    );
-			//    return textRange.Text;
-			//}
 		}
 	}
 }

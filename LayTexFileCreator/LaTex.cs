@@ -204,7 +204,7 @@ namespace LayTexFileCreator
 				file.WriteLine("a4paper,");
 				file.WriteLine("total ={ 170mm,257mm},");
 				file.WriteLine("left = 20mm,");
-				file.WriteLine("top = 20mm,");
+				file.WriteLine("top = 60mm,");
 				file.WriteLine("}");
 				file.WriteLine("\\usepackage[english]{ babel}");
 				file.WriteLine("\\usepackage{fancyhdr}");

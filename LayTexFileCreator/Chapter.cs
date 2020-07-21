@@ -53,7 +53,7 @@ namespace LayTexFileCreator
 
         internal string GetDateCreated()
         {
-            return "Fill in latter";
+            return "Fill in later";
         }
     }
 }

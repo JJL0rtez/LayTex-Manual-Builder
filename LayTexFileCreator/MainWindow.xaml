@@ -42,7 +42,7 @@
                     <Button FontSize="14" Click="AddParagraph_Click" Name="addParagraph" Content="Paragraph" HorizontalAlignment="Left" Margin="15,5,0,0" VerticalAlignment="Top" Width="100" Height="27"/>
                     <Button FontSize="14" Click="AddList_Click" Name="addList" Content="List" HorizontalAlignment="Left" Margin="172,5,0,0" VerticalAlignment="Top" Width="100" Height="27"/>
                     <Button FontSize="14" Click="AddFigure_Click" x:Name="AddFigure" Content="Figure" HorizontalAlignment="Left" Margin="15,40,0,0" VerticalAlignment="Top" Width="100" Height="27"/>
-                    <Button FontSize="14" Click="AddTable_Click" x:Name="AddParagraph" Content="Table" HorizontalAlignment="Left" Margin="172,41,0,0" VerticalAlignment="Top" Width="100" Height="27"/>
+                    <Button FontSize="14" Click="AddTable_Click" x:Name="AddParagraph" Content="Table" HorizontalAlignment="Left" Margin="172,41,0,0" VerticalAlignment="Top" Width="100" Height="27" IsEnabled="False"/>
                 </Grid>
             </GroupBox>
             <GroupBox FontSize="14" Header="Elements" HorizontalAlignment="Left" Height="531" Margin="1038,139,0,0" VerticalAlignment="Top" Width="302" RenderTransformOrigin="0.2,-0.086">
