@@ -1,6 +1,6 @@
 # LayTex-Manual-Builder
 
-===================================================================================================
+==========================================================================
 # Future Features
 1.  Ability to add tables to your manual
 2.  Expanded settings functionality
@@ -11,19 +11,19 @@
 7.  "Add to desktop" option
 8.  "Add to taskbar" option
 
-===================================================================================================
+==========================================================================
 # Know Bugs
 1.  Window to large by default on low res devices
-2.  Gui breaks when switching between table and other views
-3.  Hard crash when accessing if required files are not found
+2.  Gui breaks when switching between table\Figure and other views
+3. 
 4. 
 
-===================================================================================================
+==========================================================================
 # TODO
-1.  Create installer
+1.  
 2.  Fix visual error when switching between views
-3.  Disable table button for production until feature is finished
-4.  Add an auto repair function to program
+3. 
+4.  
 5.  Add resizing to program
 6.  Finish implementing of settings page
 7.  Add popup to indicate if Git post/pull was sucussful
