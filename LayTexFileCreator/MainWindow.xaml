@@ -33,7 +33,9 @@
                 <MenuItem Header="_Open Tutorials Document" Click="OpenTutorialDocument_Click"/>
             </MenuItem>
             <MenuItem Header="_Settings" >
-                <MenuItem Header="_Open Settings Page" Click="OpenSettingsPage_Click"/>
+                <MenuItem Header="_Document Settings" Click="OpenSettingsPage_Click"/>
+                <MenuItem Header="_Installer Settings" Click="InstallerItem_Click"/>
+                <MenuItem Header="_Program Settings" Click="ProgramItem_Click"/>
             </MenuItem>
         </Menu>
         <Grid Margin="0,49,0,0">

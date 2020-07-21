@@ -151,7 +151,6 @@ namespace LayTexFileCreator
 			}
 			return data;
 		}
-
         public void CompileBook(Book book)
         {
 			// Vetify file structure

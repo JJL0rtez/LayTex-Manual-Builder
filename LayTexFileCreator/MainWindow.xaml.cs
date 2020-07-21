@@ -95,7 +95,7 @@ namespace LayTexFileCreator {
 		closeBtn = new Button(),
 		textColorBtn = new Button(),
 		underLinebtn = new Button();
-		string allign = "left";
+		string allign;
 		ComboBox textSizeCB = new ComboBox(),
 		textColorCB = new ComboBox();
 
@@ -755,6 +755,33 @@ namespace LayTexFileCreator {
 		private void OpenSettingsPage_Click(object sender, RoutedEventArgs e) {
 			OpenSettingsPage();
 		}
+		private void InstallerItem_Click(object sender, RoutedEventArgs e)
+		{
+			// open install options menu
+			/*
+			 * Controls for:
+			 * 1. Add to Start menu toggle
+			 * 2. Program base install location
+			 * 3. Add to taskbar toggle
+			 * 4. Add to Quick start menu
+			 * 5. 
+			 * 
+			 */
+		}
+		private void ProgramItem_Click(object sender, RoutedEventArgs e)
+		{
+			// open program options menu
+			/*
+			 * Controls for:
+			 * 1. Program theme
+			 * 2. Git save url
+			 * 3. Git origin setup button with confirmation
+			 * 4. Git pull and push test button
+			 * 5. 
+			 * 
+			 */
+		}
+
 		/*
          * Method Name: PushItem_Click
          * Method Description: Triggered by Git-->Push this method calls the file SaveFiles.bat as a process.
@@ -1031,7 +1058,7 @@ namespace LayTexFileCreator {
 					popup.Close();
 					page.Setname(popupTextbox.Text);
 					SaveFileDialog saveFileDialog = new SaveFileDialog {
-						Filter = "Xml file|*.xml",
+						Filter = "Spg file|*.spg",
 						Title = "Save a page data File",
 						FileName = popupTextbox.Text + ".xml"
 					};
@@ -1469,9 +1496,9 @@ namespace LayTexFileCreator {
 					popup.Close();
 					popup = new Window();
 					SaveFileDialog saveFileDialog = new SaveFileDialog {
-						Filter = "Xml file|*.xml",
+						Filter = "sch file|*.sch",
 						Title = "Save a page data File",
-						FileName = popupTextbox.Text + "_sorted.xml"
+						FileName = popupTextbox.Text + "_sorted.sch"
 					};
 
 					saveFileDialog.ShowDialog();
@@ -1943,6 +1970,12 @@ namespace LayTexFileCreator {
 			sortedPages.Clear();
 			lSBtnAfterChapter = -1;
 		}
+
+		private void MenuItem_Click(object sender, RoutedEventArgs e)
+		{
+
+		}
+
 		private void AddChapter_Click(object sender, RoutedEventArgs e) {
 			if (lSBtnBeforeChapter != -1) {
 				Button last = new Button {
@@ -2006,7 +2039,7 @@ namespace LayTexFileCreator {
 
 				SaveFileDialog saveFileDialog = new SaveFileDialog {
 					InitialDirectory = config.DEFAULT_DIRECTORY_LOCATION + config.DEFAULT_DIRECTORY_LOCATION,
-					Filter = "Xml file|*.xml",
+					Filter = "Sbk file|*.sbk",
 					Title = "Save a page data File",
 					FileName = DateTime.Now.ToString("yyyy_MM_dd_h_mm_ss_tt") + "_backup.xml"
 				};
@@ -2723,7 +2756,7 @@ namespace LayTexFileCreator {
 			catch (ArgumentOutOfRangeException ex)
 			{
 				// This type of error will be triggered if files are missing from the install
-				MessageBox.Show("Error in file structure.\nNow running program repair.");
+				MessageBox.Show("Error in file structure.\n" + ex.Message + "\nNow running program repair.");
 				Installer installer = new Installer();
 				if (installer.Install())
 				{

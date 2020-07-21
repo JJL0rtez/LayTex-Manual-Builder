@@ -9,7 +9,6 @@ namespace LayTexFileCreator
 {
     public class Installer
     {
-
         public bool Install()
         {
 			Config config = new Config();
@@ -79,8 +78,6 @@ namespace LayTexFileCreator
 				return false;
 			}
 		}
-
-
 		private static void Copy(string sourceDirectory, string targetDirectory)
 		{
 			var diSource = new DirectoryInfo(sourceDirectory);
@@ -88,8 +85,6 @@ namespace LayTexFileCreator
 
 			CopyAll(diSource, diTarget);
 		}
-
-
 		private static void CopyAll(DirectoryInfo source, DirectoryInfo target)
 		{
 			Directory.CreateDirectory(target.FullName);
@@ -109,7 +104,6 @@ namespace LayTexFileCreator
 				CopyAll(diSourceSubDir, nextTargetSubDir);
 			}
 		}
-
 		public bool CheckFileStructure()
 		{
 			Config config = new Config();
@@ -120,7 +114,7 @@ namespace LayTexFileCreator
 				!Directory.Exists(config.DEFAULT_PAGE_LOCATION)							||
 				!Directory.Exists("C:\\StonetownKarateManual\\bin")						||
 				!Directory.Exists("C:\\StonetownKarateManual\\bin\\images")				||
-				!File.Exists("C:\\StonetownKarateManual\\bin\\tutorialDocument.pdf")			||
+				!File.Exists("C:\\StonetownKarateManual\\bin\\tutorialDocument.pdf")	||
 				!File.Exists("C:\\StonetownKarateManual\\Save Files.bat")				||
 				!File.Exists("C:\\StonetownKarateManual\\Update Files.bat")) 
 			{
