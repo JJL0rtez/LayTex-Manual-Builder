@@ -38,6 +38,12 @@ namespace LayTexFileCreator
         public Brush TEXT_COLOR { get; set; }
         public int FONT_SIZE { get; set; }
         public int BUTTON_HEIGHT { get; set; }
+
+        public bool CREATE_START_MENU_ENTRY { get; set; }
+        public bool CREATE_TASK_BAR_ENTRY { get; set; }
+        public bool CREATE_QUICK_LAUNCH_ENTRY { get; set; }
+        public string GIT_FILE_SAVE_URL { get; set; }
+
         public Config() {
             // Program Colors
             BrushConverter bc = new BrushConverter();  
