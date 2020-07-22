@@ -1060,7 +1060,7 @@ namespace LayTexFileCreator {
 					SaveFileDialog saveFileDialog = new SaveFileDialog {
 						Filter = "Spg file|*.spg",
 						Title = "Save a page data File",
-						FileName = popupTextbox.Text + ".xml"
+						FileName = popupTextbox.Text + ".spg"
 					};
 
 					saveFileDialog.ShowDialog();
@@ -1370,7 +1370,7 @@ namespace LayTexFileCreator {
 			chapters.Clear();
 			List<string> files = new List<string>();
 			if (dialog.ShowDialog() == CommonFileDialogResult.Ok) {
-				files = Directory.GetFiles(dialog.FileName, "*.xml", SearchOption.AllDirectories).ToList();
+				files = Directory.GetFiles(dialog.FileName, "*.sch", SearchOption.AllDirectories).ToList();
 			}
 			foreach (string file in files) {
 				System.Xml.Serialization.XmlSerializer reader = new System.Xml.Serialization.XmlSerializer(typeof(Chapter));
@@ -2065,7 +2065,7 @@ namespace LayTexFileCreator {
 				};
 				List<string> files = new List<string>();
 				if (dialog.ShowDialog() == CommonFileDialogResult.Ok) {
-					files = Directory.GetFiles(dialog.FileName, "*.xml", SearchOption.AllDirectories).ToList();
+					files = Directory.GetFiles(dialog.FileName, "*.sch", SearchOption.AllDirectories).ToList();
 				}
 				foreach (string file in files) {
 					System.Xml.Serialization.XmlSerializer reader = new System.Xml.Serialization.XmlSerializer(typeof(Page));
@@ -2512,6 +2512,7 @@ namespace LayTexFileCreator {
 			int idNum = Int32.Parse(id);
 			selectedId = idNum;
 			titleLabel.Content = "Paragraph Title";
+			bodyLabel.Content = "Paragraph Title";
 			try {
 				iconImage.Add(new Image {
 					Source = new BitmapImage(new Uri(@"C:\\StonetownKarateManual\\bin\\images\\spacing.png"))
@@ -2959,6 +2960,8 @@ namespace LayTexFileCreator {
 			//   body.TextChanged += UpdateBody;
 			body.SpellCheck.IsEnabled = true;
 			body.TextWrapping = 0;
+			body.AcceptsReturn = true;
+
 			// body.TextWrapping = 0;
 			body.HorizontalAlignment = HorizontalAlignment.Center;
 			body.ToolTip = "Type your section body here";

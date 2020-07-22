@@ -142,9 +142,10 @@ namespace LayTexFileCreator
 							{
 								data[tmp].AddRange(DoFigure(element));
 							}
+						
 						}
-						tmp++;
 					}
+					tmp++;
 				}
 
 				
@@ -203,7 +204,7 @@ namespace LayTexFileCreator
 				file.WriteLine("a4paper,");
 				file.WriteLine("total ={ 170mm,257mm},");
 				file.WriteLine("left = 20mm,");
-				file.WriteLine("top = 60mm,");
+				file.WriteLine("top = 20mm,");
 				file.WriteLine("}");
 				file.WriteLine("\\usepackage[english]{ babel}");
 				file.WriteLine("\\usepackage{fancyhdr}");
@@ -211,7 +212,7 @@ namespace LayTexFileCreator
 				file.WriteLine("\\usepackage{xcolor}");
 				file.WriteLine("\\usepackage{blindtext}");
 				file.WriteLine("\\usepackage{graphicx}");
-				file.WriteLine("\\usepackage[colorlinks, urlcolor = red, linkcolor = red, citecolor = red, filecolor = red]{hyperref}");
+				file.WriteLine("\\usepackage[colorlinks, urlcolor = red, linkcolor = black, citecolor = red, filecolor = red]{hyperref}");
 				file.WriteLine("\\graphicspath{ {" + config.IMAGE_GRAPHICS_PATH + "/} }");
 				file.WriteLine("");
 				file.WriteLine("\\pagestyle{fancy}");
@@ -228,6 +229,11 @@ namespace LayTexFileCreator
 				file.WriteLine("\\begin{titlepage}");
 				file.WriteLine("\\centering");
 				file.WriteLine("\\scshape");
+				file.WriteLine("\\vspace *{\\baselineskip}");
+				file.WriteLine("\\vspace *{\\baselineskip}");
+				file.WriteLine("\\vspace *{\\baselineskip}");
+				file.WriteLine("\\vspace *{\\baselineskip}");
+				file.WriteLine("\\vspace *{\\baselineskip}");
 				file.WriteLine("\\includegraphics[width = 7cm, height = 6.02cm]{" + config.COVER_LOGO_LOCATION + "}");
 				file.WriteLine("\\vspace *{\\baselineskip}");
 				file.WriteLine("");

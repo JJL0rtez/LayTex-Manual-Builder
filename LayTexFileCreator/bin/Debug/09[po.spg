@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<Page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <name>09[po</name>
+  <dateCreated>12:10:35 PM</dateCreated>
+  <elements>
+    <Element>
+      <title>Test Table</title>
+      <ImageSize>1</ImageSize>
+      <listItems />
+      <Body>\begin{table}[]
+\begin{tabular}{llll}
+\cline{1-1}
+\multicolumn{1}{|l|}{Data} &amp; Needs &amp; To   &amp; Go              \\ \cline{1-1}
+In                         &amp; Each  &amp; Of   &amp; These           \\
+Cells                      &amp; Such  &amp; That &amp; The             \\
+Data                       &amp; Can   &amp; Be   &amp; Shown in a Grid
+\end{tabular}
+\end{table}</Body>
+      <ElementType>Paragraph</ElementType>
+      <TableContents />
+    </Element>
+    <Element>
+      <title>1.1 K/D</title>
+      <ImageSize>0</ImageSize>
+      <listItems />
+      <ImageLoc>C:\Users\jjlor\Pictures\SSSS.PNG</ImageLoc>
+      <ElementType>Figure</ElementType>
+      <TableContents />
+    </Element>
+    <Element>
+      <title>Test Table</title>
+      <ImageSize>1</ImageSize>
+      <listItems />
+      <Body>\begin{table}[]
+\begin{tabular}{llll}
+\cline{1-1}
+\multicolumn{1}{|l|}{Data} &amp; Needs &amp; To   &amp; Go              \\ \cline{1-1}
+In                         &amp; Each  &amp; Of   &amp; These           \\
+Cells                      &amp; Such  &amp; That &amp; The             \\
+Data                       &amp; Can   &amp; Be   &amp; Shown in a Grid
+\end{tabular}
+\end{table}</Body>
+      <ElementType>Paragraph</ElementType>
+      <TableContents />
+    </Element>
+  </elements>
+  <dateEdited>12:19:04 PM</dateEdited>
+</Page>
