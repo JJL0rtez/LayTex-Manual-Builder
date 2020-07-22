@@ -39,6 +39,10 @@ namespace LayTexFileCreator
         public int FONT_SIZE { get; set; }
         public int BUTTON_HEIGHT { get; set; }
 
+        public List<string> FONTS { get; set; }
+        public List<string> COLORS { get; set; }
+
+
         public bool CREATE_START_MENU_ENTRY { get; set; }
         public bool CREATE_TASK_BAR_ENTRY { get; set; }
         public bool CREATE_QUICK_LAUNCH_ENTRY { get; set; }
@@ -79,6 +83,94 @@ namespace LayTexFileCreator
             // Gui Presets
             FONT_SIZE = 12;
             BUTTON_HEIGHT = 30;
+            COLORS = new List<string> {
+                "black",
+                "blue",
+                "brown",
+                "cyan",
+                "darkgray",
+                "gray",
+                "green",
+                "lime",
+                "magenta",
+                "olive",
+                "orange",
+                "pink",
+                "purple",
+                "red",
+                "teal",
+                "violet",
+                "white",
+                "yellow"
+            };
+            FONTS = new List<string> {
+                "Aharoni",
+                "Andalus",
+                "AngsanaUPC",
+                "Angsana New",
+                "Arabic Transparent",
+                "Arial",
+                "Arial Black",
+                "Batang",
+                "Browallia New",
+                "Comic Sans MS",
+                "CordiaUPC",
+                "Tunga",
+                "Verdana",
+                "Vrinda",
+                "Webdings",
+                "Wingdings",
+                "Traditional Arabic",
+                "Trebuchet MS",
+                "Tahoma",
+                "Cordia New",
+                "Courier New",
+                "David",
+                "DFKai-SB",
+                "DilleniaUPC",
+                "Estrangelo Edessa",
+                "EucrosiaUPC",
+                "Fixed Miriam Transparent",
+                "Franklin Gothic",
+                "FrankRuehl",
+                "FreesiaUPC",
+                "Gautami",
+                "Georgia",
+                "Gulim",
+                "Impact",
+                "IrisUPC",
+                "JasmineUPC",
+                "KaiTi",
+                "Kartika",
+                "KodchiangUPC",
+                "Latha",
+                "Levenim MT",
+                "LilyUPC",
+                "Lucida Console",
+                "Lucida Sans",
+                "Lucida Sans Unicode",
+                "Mangal",
+                "Marlett",
+                "PMingLiU",
+                "Miriam",
+                "Miriam Fixed",
+                "MS Gothic",
+                "MS Mincho",
+                "MV Boli",
+                "Narkisim",
+                "Palatino Linotype",
+                "PMingLiU-ExtB",
+                "Raavi",
+                "Rod",
+                "Shruti",
+                "SimHei",
+                "Simplified Arabic Fixed",
+                "Simplified Arabic Fixed",
+                "SimSun-ExtB",
+                "Sylfaen",
+                "Symbol",
+                "Times New Roman"
+            };
         }
     }
 }

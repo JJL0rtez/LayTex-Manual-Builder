@@ -19,64 +19,66 @@ namespace LayTexFileCreator {
 		// Config / Settings
 		Config config = new Config();
 
-		List<Element> elements = new List<Element>();
-		List<Page> pages = new List<Page>();
-		List<Chapter> chapters = new List<Chapter>();
+		List<Element> elements = new List<Element>();						// List of all currently loaded elements.
+		List<Page> pages = new List<Page>();                                // List of all currently loaded pages.
+		List<Chapter> chapters = new List<Chapter>();                       // List of all currently loaded chapters.
+
+		Button sortedButtonDef = new Button();
 
 		// ** NOTE ** lSBtn == lastSelectedButton 
 
 		// Sorting elements vars
-		List<Element> sortedElements = new List<Element>();
+		List<Element> sortedElements = new List<Element>();                 // List of all currently loaded sorted elements.
 		List<Button> lSBtn = new List<Button>(),
 		lSBtnSorted = new List<Button>();
-		int lSBtnBefore = 0,
-		lSBtnAfter = 0;
-		Button removeElementBtn = new Button(),
-		moveUpBtn = new Button(),
-		moveDownBtn = new Button(),
-		removeAllElementBtn = new Button(),
-		addAllElementBtn = new Button(),
-		addSelectedElement = new Button();
-		ListBox sVBefore = new ListBox(),
-		sVAfter = new ListBox();
+		int lSBtnBefore = 0,												// Tracks index of selected button in page sorter on the before list
+		lSBtnAfter = 0;                                                     // Tracks index of selected button in page sorter on the after list
+		Button removeElementBtn = new Button(),                             // Used to remove selected element up in order when in page sorter
+		moveUpBtn = new Button(),											// Used to move elements up in order when in page sorter
+		moveDownBtn = new Button(),                                         // Used to move elements down in order when in page sorter
+		removeAllElementBtn = new Button(),									// Used to remove all selected elements from the page sorter after list
+		addAllElementBtn = new Button(),                                    // Used to add all elements from the page sorter after list
+		addSelectedElement = new Button();                                  // Used to add selected elements from the page sorter after list
+		ListBox sVBefore = new ListBox(),									// List of all elements on seleted page
+		sVAfter = new ListBox();											// List of all selected elemments on selected page
 		// Sorting chapter vars
-		List<Page> sortedPages = new List<Page>();
+		List<Page> sortedPages = new List<Page>();							// List of all sorted pages
 		List<Button> lSBtnChapter = new List<Button>(),
-		lSBtnSortedChapter = new List<Button>();
-		int lSBtnBeforeChapter = 0,
-		lSBtnAfterChapter = 0;
-		Button removeChapterBtn = new Button(),
+		lSBtnSortedChapter = new List<Button>();							//
+		int lSBtnBeforeChapter = 0,                                         // Tracks index of selected button in chapter sorter on the before list 
+		lSBtnAfterChapter = 0;                                              // Tracks index of selected button in chapter sorter on the after list
+		Button removeChapterBtn = new Button(),								// Used to remove selected chapter for the after list in chapter sorter
 		moveUpBtnChapter = new Button(),
 		moveDownBtnChapter = new Button(),
 		removeAllChapterBtn = new Button(),
 		addAllChapterBtn = new Button(),
 		addSelectedChapter = new Button();
 		ListBox sVBeforeChapter = new ListBox(),
-		sVAfterChapter = new ListBox();
+		sVAfterChapter = new ListBox();										//
 		// Sorting page vars
-		List<Chapter> sortedChapters = new List<Chapter>();
-		List<Button> lSBtnBook = new List<Button>(),
-		lSBtnSortedBook = new List<Button>();
-		int lSBtnBeforeBook = 0,
-		lSBtnAfterBook = 0;
-		Button removeBookBtn = new Button(),
-		moveUpBtnBook = new Button(),
-		moveDownBtnBook = new Button(),
-		removeAllBookBtn = new Button(),
-		addAllBookBtn = new Button(),
-		addSelectedBook = new Button();
-		ListBox sVBeforeBook = new ListBox(),
-		sVAfterBook = new ListBox();
-
-		Page page = new Page();
-		Book book = new Book();
-		Chapter chapter = new Chapter();
-		Window popup = new Window();
-		Grid popupGrid = new Grid();
+		List<Chapter> sortedChapters = new List<Chapter>();					//
+		List<Button> lSBtnBook = new List<Button>(),						//
+		lSBtnSortedBook = new List<Button>();								//
+		int lSBtnBeforeBook = 0,											//
+		lSBtnAfterBook = 0;													//
+		Button removeBookBtn = new Button(),								//
+		moveUpBtnBook = new Button(),										//
+		moveDownBtnBook = new Button(),										//
+		removeAllBookBtn = new Button(),									//
+		addAllBookBtn = new Button(),										//
+		addSelectedBook = new Button();										//
+		ListBox sVBeforeBook = new ListBox(),								//
+		sVAfterBook = new ListBox();										//
+		// Obj vars
+		Page page = new Page();												// Used to access information of elements on the current page
+		Book book = new Book();                                             // Used to access information on the current collection of chapters
+		Chapter chapter = new Chapter();                                    // Used to access information of the current chapter
+		Window popup = new Window();										// Basic window obj used to display all non-main windows
+		Grid popupGrid = new Grid();										// Basic grid obj used to format element editor
 
 		// Create page editor elements
-		TextBox title = new TextBox();
-		TextBox body = new TextBox();
+		TextBox title = new TextBox();										// Used to edit the title in the editor
+		TextBox body = new TextBox();										// Used to edit the body in paragraph mode editor
 		Grid grid = new Grid();
 		List<Image> iconImage = new List<Image>();
 
@@ -152,24 +154,23 @@ namespace LayTexFileCreator {
 				}
 				Exit();
 			}
-			// Initlize program
+			else
+			{
+			// Initlize program if program files where verified
 			InitlizePageEditor();
-
-			//this.Mouse.
+			}
 		}
 
 		private void InitlizePageEditor() {
-			//InitlizePageEditor();
+			// initlize the wpf window
 			InitializeComponent();
-			elements = new List<Element>();
+			// initial setup for multiple wpf elements and vars
 			InitialSetup();
-			addBtn.Content = "Add Element";
-			body.Text = "";
-			title.Text = "";
+			// This tells the method to initlize the paragraph editor with blank fields
 			InitlizeParagraph("-1");
 		}
-
 		private void OpenSettingsPage() {
+			// Initlize a window obj called window to be used in settings editor
 			Window window = new Window {
 				Height = 768,
 				Width = 700,
@@ -179,7 +180,7 @@ namespace LayTexFileCreator {
 				ResizeMode = ResizeMode.NoResize
 			};
 
-			Grid grid = new Grid(); //, tmpGrid = new Grid();
+			Grid grid = new Grid(); 
 			List<Grid> grids = new List<Grid>();
 			ListBox listBox = new ListBox {
 				Width = 650,
@@ -512,74 +513,9 @@ namespace LayTexFileCreator {
 				FontSize = config.FONT_SIZE,
 				Foreground = Brushes.White
 			};
-			List<string> fonts = new List<string> {
-				"Aharoni",
-				"Andalus",
-				"AngsanaUPC",
-				"Angsana New",
-				"Arabic Transparent",
-				"Arial",
-				"Arial Black",
-				"Batang",
-				"Browallia New",
-				"Comic Sans MS",
-				"CordiaUPC",
-				"Tunga",
-				"Verdana",
-				"Vrinda",
-				"Webdings",
-				"Wingdings",
-				"Traditional Arabic",
-				"Trebuchet MS",
-				"Tahoma",
-				"Cordia New",
-				"Courier New",
-				"David",
-				"DFKai-SB",
-				"DilleniaUPC",
-				"Estrangelo Edessa",
-				"EucrosiaUPC",
-				"Fixed Miriam Transparent",
-				"Franklin Gothic",
-				"FrankRuehl",
-				"FreesiaUPC",
-				"Gautami",
-				"Georgia",
-				"Gulim",
-				"Impact",
-				"IrisUPC",
-				"JasmineUPC",
-				"KaiTi",
-				"Kartika",
-				"KodchiangUPC",
-				"Latha",
-				"Levenim MT",
-				"LilyUPC",
-				"Lucida Console",
-				"Lucida Sans",
-				"Lucida Sans Unicode",
-				"Mangal",
-				"Marlett",
-				"PMingLiU",
-				"Miriam",
-				"Miriam Fixed",
-				"MS Gothic",
-				"MS Mincho",
-				"MV Boli",
-				"Narkisim",
-				"Palatino Linotype",
-				"PMingLiU-ExtB",
-				"Raavi",
-				"Rod",
-				"Shruti",
-				"SimHei",
-				"Simplified Arabic Fixed",
-				"Simplified Arabic Fixed",
-				"SimSun-ExtB",
-				"Sylfaen",
-				"Symbol",
-				"Times New Roman"
-			};
+			// Pull font list from config file
+			List<string> fonts = config.FONTS;
+
 			ComboBox FontFamilyComboBox = new ComboBox {
 				Width = listBox.Width - 20,
 				Height = config.BUTTON_HEIGHT,
@@ -628,26 +564,7 @@ namespace LayTexFileCreator {
 				SelectedIndex = 13
 
 			};
-			List<string> colors = new List<string> {
-				"black",
-				"blue",
-				"brown",
-				"cyan",
-				"darkgray",
-				"gray",
-				"green",
-				"lime",
-				"magenta",
-				"olive",
-				"orange",
-				"pink",
-				"purple",
-				"red",
-				"teal",
-				"violet",
-				"white",
-				"yellow"
-			};
+			List<string> colors = config.COLORS;
 			foreach (string color in colors) {
 				comboBoxItem = new ComboBoxItem {
 					Content = color
@@ -708,23 +625,6 @@ namespace LayTexFileCreator {
 			window.Content = grid;
 			window.Show();
 		}
-
-		//private void OpenInitialWindow()
-		//{
-		//    Window initialWindow = new Window
-		//    {
-		//        //initialWindow.U
-		//        Content = initialWindowGrid,
-		//        Width = 800,
-		//        Height = 600
-		//    };
-		//    initialWindow.Show();
-		//    initialWindow.Title = "Stonetown Karate Manual Editor";
-
-		//    initialWindowGrid.Width = initialWindow.Width;
-		//    initialWindowGrid.Height = initialWindow.Height;
-		//}
-
 		/*
          * Method Name: AddParagraph_Click
          * Method Description: Runs when the "Paragraph" button on the page editor is clicked. Calls 
@@ -781,7 +681,6 @@ namespace LayTexFileCreator {
 			 * 
 			 */
 		}
-
 		/*
          * Method Name: PushItem_Click
          * Method Description: Triggered by Git-->Push this method calls the file SaveFiles.bat as a process.
@@ -1302,47 +1201,18 @@ namespace LayTexFileCreator {
 			addAllBookBtn = new Button();
 
 			//Sorted view
-			moveUpBtnBook.Width = 120;
-			moveUpBtnBook.Height = config.BUTTON_HEIGHT;
-			moveUpBtnBook.Content = "Move Up";
+			moveUpBtnBook = SetWpfData("Move Up", 10, -5, 10, -5);
 			moveUpBtnBook.Click += MoveUpBook_Click;
-			moveUpBtnBook.HorizontalAlignment = HorizontalAlignment.Center;
-			moveUpBtnBook.Margin = new Thickness(10, -5, 10, -5);
-
-			moveDownBtnBook.Width = 120;
-			moveDownBtnBook.Height = config.BUTTON_HEIGHT;
-			moveDownBtnBook.Content = "Move Down";
+			moveDownBtnBook = SetWpfData("Move Down", 10, -5, 130, -5);
 			moveDownBtnBook.Click += MoveDownBook_Click;
-			moveDownBtnBook.HorizontalAlignment = HorizontalAlignment.Center;
-			moveDownBtnBook.Margin = new Thickness(10, -5, 130, -5);
-
-			removeBookBtn.Width = 120;
-			removeBookBtn.Height = config.BUTTON_HEIGHT;
-			removeBookBtn.Content = "Remove One";
+			removeBookBtn = SetWpfData("Remove One", 130, -5, 10, -5);
 			removeBookBtn.Click += RemoveBook_Click;
-			removeBookBtn.HorizontalAlignment = HorizontalAlignment.Center;
-			removeBookBtn.Margin = new Thickness(130, -5, 10, -5);
-
-			removeAllBookBtn.Width = 120;
-			removeAllBookBtn.Height = config.BUTTON_HEIGHT;
-			removeAllBookBtn.Content = "Remove All";
+			removeAllBookBtn = SetWpfData("Remove All", 10, -5, 130, -5);
 			removeAllBookBtn.Click += RemoveAllBook_Click;
-			removeAllBookBtn.HorizontalAlignment = HorizontalAlignment.Center;
-			removeAllBookBtn.Margin = new Thickness(10, -5, 130, -5);
-
-			addSelectedBook.Width = 120;
-			addSelectedBook.Height = config.BUTTON_HEIGHT;
-			addSelectedBook.Content = "Add One";
+			addSelectedBook = SetWpfData("Add One", 125, -5, 10, -5);
 			addSelectedBook.Click += AddBook_Click;
-			addSelectedBook.HorizontalAlignment = HorizontalAlignment.Center;
-			addSelectedBook.Margin = new Thickness(125, -5, 10, -5);
-
-			addAllBookBtn.Width = 120;
-			addAllBookBtn.Height = config.BUTTON_HEIGHT;
-			addAllBookBtn.Content = "Add All";
+			addAllBookBtn = SetWpfData("Add All", 10, -5, 10, -5);
 			addAllBookBtn.Click += AddAllBook_Click;
-			addAllBookBtn.HorizontalAlignment = HorizontalAlignment.Center;
-			addAllBookBtn.Margin = new Thickness(10, -5, 10, -5);
 
 			Grid.SetColumn(moveUpBtnBook, 0);
 			controlsGrid.Children.Add(moveUpBtnBook);
@@ -1970,12 +1840,10 @@ namespace LayTexFileCreator {
 			sortedPages.Clear();
 			lSBtnAfterChapter = -1;
 		}
-
 		private void MenuItem_Click(object sender, RoutedEventArgs e)
 		{
 
 		}
-
 		private void AddChapter_Click(object sender, RoutedEventArgs e) {
 			if (lSBtnBeforeChapter != -1) {
 				Button last = new Button {
@@ -2075,7 +1943,9 @@ namespace LayTexFileCreator {
 					file1.Close();
 				}
 				// First clear all elements 
+				
 				sVBeforeChapter.Items.Clear();
+				
 				lSBtnChapter.Clear();
 
 				// Tmp btn and counting var
@@ -2182,7 +2052,7 @@ namespace LayTexFileCreator {
 			//grid.Margin = new Thickness(5);
 			// Add selector controls
 			sVBeforeChapter = new ListBox {
-				Height = groupBoxAfter.Height - 30,
+				Height = groupBoxBefore.Height - 30,
 				Width = subWindow.Width / 2 - 40,
 				HorizontalAlignment = HorizontalAlignment.Center,
 				VerticalAlignment = VerticalAlignment.Center,
@@ -2308,47 +2178,18 @@ namespace LayTexFileCreator {
 			addAllElementBtn = new Button();
 
 			//Sorted view
-			moveUpBtn.Width = 120;
-			moveUpBtn.Height = config.BUTTON_HEIGHT;
-			moveUpBtn.Content = "Move Up";
+			moveUpBtn = SetWpfData("Move Up", 10, -5, 10, -5);
 			moveUpBtn.Click += MoveElementUp_Click;
-			moveUpBtn.HorizontalAlignment = HorizontalAlignment.Center;
-			moveUpBtn.Margin = new Thickness(10, -5, 10, -5);
-
-			moveDownBtn.Width = 120;
-			moveDownBtn.Height = config.BUTTON_HEIGHT;
-			moveDownBtn.Content = "Move Down";
+			moveDownBtn = SetWpfData("Move Down", 10, -5, 130, -5);
 			moveDownBtn.Click += MoveElementDown_Click;
-			moveDownBtn.HorizontalAlignment = HorizontalAlignment.Center;
-			moveDownBtn.Margin = new Thickness(10, -5, 130, -5);
-
-			removeElementBtn.Width = 120;
-			removeElementBtn.Height = config.BUTTON_HEIGHT;
-			removeElementBtn.Content = "Remove One";
+			removeElementBtn = SetWpfData("Remove One", 130, -5, 10, -5);
 			removeElementBtn.Click += RemoveElement_Click;
-			removeElementBtn.HorizontalAlignment = HorizontalAlignment.Center;
-			removeElementBtn.Margin = new Thickness(130, -5, 10, -5);
-
-			removeAllElementBtn.Width = 120;
-			removeAllElementBtn.Height = config.BUTTON_HEIGHT;
-			removeAllElementBtn.Content = "Remove All";
+			removeAllElementBtn = SetWpfData("Remove All", 10, -5, 130, -5);
 			removeAllElementBtn.Click += RemoveAllElement_Click;
-			removeAllElementBtn.HorizontalAlignment = HorizontalAlignment.Center;
-			removeAllElementBtn.Margin = new Thickness(10, -5, 130, -5);
-
-			addSelectedElement.Width = 120;
-			addSelectedElement.Height = config.BUTTON_HEIGHT;
-			addSelectedElement.Content = "Add One";
+			addSelectedElement = SetWpfData("Add One", 125, -5, 10, -5);
 			addSelectedElement.Click += AddElement_Click;
-			addSelectedElement.HorizontalAlignment = HorizontalAlignment.Center;
-			addSelectedElement.Margin = new Thickness(125, -5, 10, -5);
-
-			addAllElementBtn.Width = 120;
-			addAllElementBtn.Height = config.BUTTON_HEIGHT;
-			addAllElementBtn.Content = "Add All";
+			addAllElementBtn = SetWpfData("Add All", 10, -5, 10, -5);
 			addAllElementBtn.Click += AddAllElement_Click;
-			addAllElementBtn.HorizontalAlignment = HorizontalAlignment.Center;
-			addAllElementBtn.Margin = new Thickness(10, -5, 10, -5);
 
 			Grid.SetColumn(moveUpBtn, 0);
 			controlsGrid.Children.Add(moveUpBtn);
@@ -2771,12 +2612,10 @@ namespace LayTexFileCreator {
 				
 			}
 		}
-
 		private void Exit()
 		{
 			System.Windows.Application.Current.Shutdown();
 		}
-
 		private void SetClearFormatting_Click(object sender, RoutedEventArgs e) {
 			if (body.SelectionLength > 0) try {
 					string tmpBody = body.Text,
@@ -2822,7 +2661,6 @@ namespace LayTexFileCreator {
 					Console.WriteLine(ex.Message);
 				}
 		}
-
 		private void SetTextSize_Click(object sender, SelectionChangedEventArgs e) {
 			if (body.SelectionLength > 0) try {
 					int pos = body.SelectionStart;
@@ -2832,7 +2670,6 @@ namespace LayTexFileCreator {
 					Console.WriteLine(ex.Message);
 				}
 		}
-
 		private void SetAllignRignt_Click(object sender, RoutedEventArgs e) {
 			rightAllignBtn.Background = Brushes.DimGray;
 			rightAllignBtn.BorderBrush = Brushes.DimGray;
@@ -2843,7 +2680,6 @@ namespace LayTexFileCreator {
 			allign = "right";
 			body.TextAlignment = TextAlignment.Right;
 		}
-
 		private void SetAllignCenter_Click(object sender, RoutedEventArgs e) {
 			rightAllignBtn.Background = config.GUI_COLOR;
 			rightAllignBtn.BorderBrush = config.GUI_COLOR;
@@ -2854,7 +2690,6 @@ namespace LayTexFileCreator {
 			allign = "center";
 			body.TextAlignment = TextAlignment.Center;
 		}
-
 		private void SetAllignLeft_Click(object sender, RoutedEventArgs e) {
 			rightAllignBtn.Background = config.GUI_COLOR;
 			rightAllignBtn.BorderBrush = config.GUI_COLOR;
@@ -2865,7 +2700,6 @@ namespace LayTexFileCreator {
 			allign = "left";
 			body.TextAlignment = TextAlignment.Left;
 		}
-
 		private void SetTextColor_Click(object sender, RoutedEventArgs e) {
 			if (body.SelectionLength > 0) try {
 					int pos = body.SelectionStart;
@@ -2875,7 +2709,6 @@ namespace LayTexFileCreator {
 					Console.WriteLine(ex.Message);
 				}
 		}
-
 		private void SetUnderline_Click(object sender, RoutedEventArgs e) {
 			if (body.SelectionLength > 0) try {
 					int pos = body.SelectionStart;
@@ -2885,7 +2718,6 @@ namespace LayTexFileCreator {
 					Console.WriteLine(ex.Message);
 				}
 		}
-
 		private void SetLink_Click(object sender, RoutedEventArgs e) {
 			if (body.SelectionLength > 0) try {
 					int pos = body.SelectionStart;
@@ -2895,7 +2727,6 @@ namespace LayTexFileCreator {
 					Console.WriteLine(ex.Message);
 				}
 		}
-
 		private void SetSmallCaps_Click(object sender, RoutedEventArgs e) {
 			if (body.SelectionLength > 0) try {
 					int pos = body.SelectionStart;
@@ -2905,7 +2736,6 @@ namespace LayTexFileCreator {
 					Console.WriteLine(ex.Message);
 				}
 		}
-
 		private void SetItalic_Click(object sender, RoutedEventArgs e) {
 			if (body.SelectionLength > 0) try {
 					int pos = body.SelectionStart;
@@ -2915,7 +2745,6 @@ namespace LayTexFileCreator {
 					Console.WriteLine(ex.Message);
 				}
 		}
-
 		private void SetBold_Click(object sender, RoutedEventArgs e) {
 			if (body.SelectionLength > 0) try {
 					int pos = body.SelectionStart;
@@ -2925,13 +2754,17 @@ namespace LayTexFileCreator {
 					Console.WriteLine(ex.Message);
 				}
 		}
-
 		private void InitialSetup() {
+			// initlize elements List
+			elements = new List<Element>();
 			// Initlize wpf elements
 			// Grid
 			grid.Width = sv.Width - 25;
 			grid.Height = sv.Height - 5;
 			grid.HorizontalAlignment = HorizontalAlignment.Left;
+
+
+			
 
 			// Text Fields
 			title.Name = "title";
@@ -3533,6 +3366,20 @@ namespace LayTexFileCreator {
 				Console.WriteLine(ex.Message);
 				return false;
 			}
+		}
+
+		public Button SetWpfData(string context, int left, int top, int right, int bottom)
+		{
+			sortedButtonDef = new Button();
+			// used to cut back on repetitive code in sorter functions
+			sortedButtonDef.Width = 120;
+			sortedButtonDef.Height = config.BUTTON_HEIGHT;
+			sortedButtonDef.HorizontalAlignment = HorizontalAlignment.Center;
+			sortedButtonDef.VerticalAlignment = VerticalAlignment.Center;
+
+			sortedButtonDef.Content = context;
+			sortedButtonDef.Margin = new Thickness(left,top,right,bottom);
+			return sortedButtonDef;
 		}
 	}
 }
