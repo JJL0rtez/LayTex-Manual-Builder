@@ -20,7 +20,7 @@
 
 ==========================================================================
 # TODO
-1.  
+1.  If program crashes show user a popup with an error message and a stacktrace if "Developer" mode is enabled 
 2.  Fix visual error when switching between views
 3. 
 4.  
