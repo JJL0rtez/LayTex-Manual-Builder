@@ -80,9 +80,9 @@ namespace LayTexFileCreator {
 		TextBox title = new TextBox();										// Used to edit the title in the editor
 		TextBox body = new TextBox();										// Used to edit the body in paragraph mode editor
 		Grid grid = new Grid();
-		List<Image> iconImage = new List<Image>();
+		List<Image> iconImage = new List<Image>();							// List used to store all icons for buttons in paragraph mode
 
-		Label titleLabel = new Label(),
+		Label titleLabel = new Label(),	
 		bodyLabel = new Label(),
 		textSizeLabel = new Label();
 		Button deleteBtn = new Button(),
